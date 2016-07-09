@@ -43,91 +43,91 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
-          <plugin>
-            <artifactId>maven-shade-plugin</artifactId>
-            <version>2.1</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>shade</goal>
-                </goals>
-                <phase>package</phase>
+            <plugin>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <relocations>
+                                <relocation>
+                                    <pattern>net.gravitydevelopment.updater</pattern>
+                                    <shadedPattern>ru.tehkode.libs.net.gravitydevelopment.updater</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache</pattern>
+                                    <shadedPattern>ru.tehkode.libs.org.apache</shadedPattern>
+                                    <excludes>
+                                        <exclude>org.apache.commons.lang.*</exclude>
+                                    </excludes>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.mojang</pattern>
+                                    <shadedPattern>ru.tehkode.libs.com.mojang</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.google.gson</pattern>
+                                    <shadedPattern>ru.tehkode.libs.com.google.gson</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jboss.seven2six</groupId>
+                <artifactId>seven2six</artifactId>
+                <version>1.1.Final</version>
+                <executions>
+                    <!-- run after "compile", lets your artifact work on 1.6 -->
+                    <execution>
+                        <id>weave</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                    </execution>
+                    <!-- run after "test-compile", lets you run your tests on 1.6 -->
+                    <execution>
+                        <id>weave-tests</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
+                <version>1.11</version>
                 <configuration>
-                  <createDependencyReducedPom>false</createDependencyReducedPom>
-                  <relocations>
-                    <relocation>
-                      <pattern>net.gravitydevelopment.updater</pattern>
-                      <shadedPattern>ru.tehkode.libs.net.gravitydevelopment.updater</shadedPattern>
-                    </relocation>
-                    <relocation>
-                      <pattern>org.apache</pattern>
-                      <shadedPattern>ru.tehkode.libs.org.apache</shadedPattern>
-                      <excludes>
-                        <exclude>org.apache.commons.lang.*</exclude>
-                      </excludes>
-                    </relocation>
-                    <relocation>
-                      <pattern>com.mojang</pattern>
-                      <shadedPattern>ru.tehkode.libs.com.mojang</shadedPattern>
-                    </relocation>
-                    <relocation>
-                      <pattern>com.google.gson</pattern>
-                      <shadedPattern>ru.tehkode.libs.com.google.gson</shadedPattern>
-                    </relocation>
-                  </relocations>
+                    <ignores>
+                        <ignore>java.lang.Throwable</ignore>
+                    </ignores>
+                    <signature>
+                        <groupId>org.codehaus.mojo.signature</groupId>
+                        <artifactId>java16</artifactId>
+                        <version>1.0</version>
+                    </signature>
                 </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.jboss.seven2six</groupId>
-            <artifactId>seven2six</artifactId>
-            <version>1.1.Final</version>
-            <executions>
-              <!-- run after "compile", lets your artifact work on 1.6 -->
-              <execution>
-                <id>weave</id>
-                <phase>process-classes</phase>
-                <goals>
-                  <goal>transform</goal>
-                </goals>
-              </execution>
-              <!-- run after "test-compile", lets you run your tests on 1.6 -->
-              <execution>
-                <id>weave-tests</id>
-                <phase>process-test-classes</phase>
-                <goals>
-                  <goal>transform</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>animal-sniffer-maven-plugin</artifactId>
-            <version>1.11</version>
-            <configuration>
-              <ignores>
-                <ignore>java.lang.Throwable</ignore>
-              </ignores>
-              <signature>
-                <groupId>org.codehaus.mojo.signature</groupId>
-                <artifactId>java16</artifactId>
-                <version>1.0</version>
-              </signature>
-            </configuration>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-                <phase>test</phase>
-              </execution>
-            </executions>
-          </plugin>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>test</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
@@ -167,11 +167,11 @@
             <artifactId>updater</artifactId>
             <version>LATEST</version>
         </dependency>
-      <dependency>
-        <groupId>com.mojang</groupId>
-        <artifactId>AccountsClient</artifactId>
-        <version>unspecified</version>
-      </dependency>
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>AccountsClient</artifactId>
+            <version>unspecified</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
@@ -182,10 +182,10 @@
             <id>gravity-repo</id>
             <url>http://repo.gravitydevelopment.net</url>
         </repository>
-      <repository>
-        <id>spigot-repo</id>
-        <url>https://hub.spigotmc.org/nexus/content/groups/public</url>
-      </repository>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/groups/public</url>
+        </repository>
     </repositories>
     <profiles>
         <profile>
