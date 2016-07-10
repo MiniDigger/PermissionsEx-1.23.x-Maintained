@@ -32,12 +32,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLogger;
@@ -94,7 +88,7 @@ public class PermissionsEx extends JavaPlugin implements NativeInterface {
     }
     protected PermissionManager permissionsManager;
     protected CommandsManager commandsManager;
-    private PermissionsExConfig config;
+    PermissionsExConfig config;
     protected SuperpermsListener superms;
     private RegexPermissions regexPerms;
     private NetEventsPlugin netEvents;
@@ -110,7 +104,7 @@ public class PermissionsEx extends JavaPlugin implements NativeInterface {
             Field field = JavaPlugin.class.getDeclaredField("logger");
             field.setAccessible(true);
             field.set(this, new PermissionsExLogger(this));
-        } catch (Exception e) {
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
             // Ignore, just hide the joke
         }
 
@@ -191,7 +185,7 @@ public class PermissionsEx extends JavaPlugin implements NativeInterface {
             this.commandsManager.register(new UtilityCommands());
 
             // Register Player permissions cleaner
-            PlayerEventsListener cleaner = new PlayerEventsListener();
+            PlayerEventsListener cleaner = new PlayerEventsListener(this);
             this.getServer().getPluginManager().registerEvents(cleaner, this);
 
             // Register service
@@ -273,7 +267,7 @@ public class PermissionsEx extends JavaPlugin implements NativeInterface {
         } catch (PermissionBackendException e) {
             logBackendExc(e);
             this.getPluginLoader().disablePlugin(this);
-        } catch (Throwable t) {
+        } catch (SecurityException | IllegalArgumentException t) {
             ErrorReport.handleError("Error while enabling: ", t);
             this.getPluginLoader().disablePlugin(this);
         }
@@ -414,7 +408,7 @@ public class PermissionsEx extends JavaPlugin implements NativeInterface {
                 Field replace = PluginLogger.class.getDeclaredField("pluginName");
                 replace.setAccessible(true);
                 replace.set(this, "");
-            } catch (Exception e) {
+            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
                 // Dispose, if stuff happens the poor server admin just won't get their joke
             }
 
@@ -432,49 +426,4 @@ public class PermissionsEx extends JavaPlugin implements NativeInterface {
         }
     }
 
-    public class PlayerEventsListener implements Listener {
-
-        @EventHandler(priority = EventPriority.MONITOR)
-        public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
-            if (event.getLoginResult() == AsyncPlayerPreLoginEvent.Result.ALLOWED && !requiresLateUserSetup()) {
-                getPermissionsManager().cacheUser(event.getUniqueId().toString(), event.getName());
-            }
-        }
-
-        @EventHandler
-        public void onPlayerLogin(PlayerJoinEvent event) {
-            try {
-                PermissionUser user = getPermissionsManager().getUser(event.getPlayer());
-                if (!user.isVirtual()) {
-                    if (!event.getPlayer().getName().equals(user.getOption("name"))) { // Update name only if user exists in config
-                        user.setOption("name", event.getPlayer().getName());
-                    }
-                    if (!config.shouldLogPlayers()) {
-                        return;
-                    }
-                    user.setOption("last-login-time", Long.toString(System.currentTimeMillis() / 1000L));
-                    // user.setOption("last-login-ip", event.getPlayer().getAddress().getAddress().getHostAddress()); // somehow this won't work
-                }
-            } catch (Throwable t) {
-                ErrorReport.handleError("While login cleanup event", t);
-            }
-        }
-
-        @EventHandler
-        public void onPlayerQuit(PlayerQuitEvent event) {
-            try {
-                PermissionUser user = getPermissionsManager().getUser(event.getPlayer());
-                if (!user.isVirtual()) {
-                    if (config.shouldLogPlayers()) {
-                        user.setOption("last-logout-time", Long.toString(System.currentTimeMillis() / 1000L));
-                    }
-
-                    user.getName(); // Set name if user was created during server run
-                }
-                getPermissionsManager().resetUser(event.getPlayer());
-            } catch (Throwable t) {
-                ErrorReport.handleError("While logout cleanup event", t);
-            }
-        }
-    }
 }

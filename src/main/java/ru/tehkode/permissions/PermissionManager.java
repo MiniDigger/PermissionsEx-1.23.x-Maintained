@@ -36,6 +36,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import ru.tehkode.permissions.events.PermisssionSystemAction;
 
 /**
  * @author t3hk0d3
@@ -54,7 +55,6 @@ public class PermissionManager {
     protected boolean debugMode = false;
     protected boolean allowOps = false;
     protected boolean userAddGroupsLast = false;
-
     protected PermissionMatcher matcher = new RegExpMatcher();
 
     public PermissionManager(PermissionsExConfig config, Logger logger, NativeInterface nativeI) throws PermissionBackendException {
@@ -533,7 +533,7 @@ public class PermissionManager {
      */
     public void setDebug(boolean debug) {
         this.debugMode = debug;
-        this.callEvent(PermissionSystemEvent.Action.DEBUGMODE_TOGGLE);
+        this.callEvent(PermisssionSystemAction.DEBUGMODE_TOGGLE);
     }
 
     /**
@@ -589,7 +589,7 @@ public class PermissionManager {
         for (PermissionUser user : getActiveUsers()) { // Clear user cache
             user.clearCache();
         }
-        this.callEvent(PermissionSystemEvent.Action.WORLDINHERITANCE_CHANGED);
+        this.callEvent(PermisssionSystemAction.WORLDINHERITANCE_CHANGED);
     }
 
     /**
@@ -615,7 +615,7 @@ public class PermissionManager {
             this.preloadGroups();
         }
 
-        this.callEvent(PermissionSystemEvent.Action.BACKEND_CHANGED);
+        this.callEvent(PermisssionSystemAction.BACKEND_CHANGED);
     }
 
     /**
@@ -674,7 +674,7 @@ public class PermissionManager {
             this.backend.reload();
         }
         if (callEvent) {
-            this.callEvent(PermissionSystemEvent.Action.RELOADED);
+            this.callEvent(PermisssionSystemAction.RELOADED);
         }
     }
 
@@ -716,7 +716,7 @@ public class PermissionManager {
         nativeI.callEvent(event);
     }
 
-    protected void callEvent(PermissionSystemEvent.Action action) {
+    protected void callEvent(PermisssionSystemAction action) {
         this.callEvent(new PermissionSystemEvent(getServerUUID(), action));
     }
 

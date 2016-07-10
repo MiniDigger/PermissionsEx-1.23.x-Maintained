@@ -82,55 +82,12 @@ public abstract class PermissibleInjector {
         @SuppressWarnings("unchecked")
         List<Object> attachmentPerms = (List<Object>) attachmentField.get(newPerm);
         attachmentPerms.clear();
-        attachmentPerms.addAll((List) attachmentField.get(old));
+        @SuppressWarnings("unchecked")
+        boolean addAll = attachmentPerms.addAll((List) attachmentField.get(old));
         newPerm.recalculatePermissions();
     }
 
     public abstract boolean isApplicable(Player player);
 
-    public static class ServerNamePermissibleInjector extends PermissibleInjector {
-
-        protected final String serverName;
-
-        public ServerNamePermissibleInjector(String clazz, String field, boolean copyValues, String serverName) {
-            super(clazz, field, copyValues);
-            this.serverName = serverName;
-        }
-
-        @Override
-        public boolean isApplicable(Player player) {
-            return player.getServer().getName().equalsIgnoreCase(serverName);
-        }
-    }
-
-    public static class ClassPresencePermissibleInjector extends PermissibleInjector {
-
-        public ClassPresencePermissibleInjector(String clazzName, String fieldName, boolean copyValues) {
-            super(clazzName, fieldName, copyValues);
-        }
-
-        @Override
-        public boolean isApplicable(Player player) {
-            try {
-                return Class.forName(clazzName).isInstance(player);
-            } catch (ClassNotFoundException e) {
-                return false;
-            }
-        }
-    }
-
-    public static class ClassNameRegexPermissibleInjector extends PermissibleInjector {
-
-        private final String regex;
-
-        public ClassNameRegexPermissibleInjector(String clazz, String field, boolean copyValues, String regex) {
-            super(clazz, field, copyValues);
-            this.regex = regex;
-        }
-
-        @Override
-        public boolean isApplicable(Player player) {
-            return player.getClass().getName().matches(regex);
-        }
-    }
 }
+

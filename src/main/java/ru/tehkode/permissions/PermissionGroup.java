@@ -18,9 +18,8 @@
  */
 package ru.tehkode.permissions;
 
-import ru.tehkode.permissions.events.PermissionEntityEvent;
-
 import java.util.*;
+import ru.tehkode.permissions.events.PermissionsEntityAction;
 
 /**
  * @author t3hk0d3
@@ -50,8 +49,8 @@ public class PermissionGroup extends PermissionEntity implements Comparable<Perm
         }
     }
 
-    public Type getType() {
-        return Type.GROUP;
+    public PermissionsEntityType getType() {
+        return PermissionsEntityType.GROUP;
     }
 
     public int getWeight() {
@@ -67,7 +66,7 @@ public class PermissionGroup extends PermissionEntity implements Comparable<Perm
         this.setOption("weight", Integer.toString(weight));
 
         this.dirtyWeight = true;
-        this.callEvent(PermissionEntityEvent.Action.WEIGHT_CHANGED);
+        this.callEvent(PermissionsEntityAction.WEIGHT_CHANGED);
     }
 
     /**
@@ -100,7 +99,7 @@ public class PermissionGroup extends PermissionEntity implements Comparable<Perm
             this.setOption("rank", null);
         }
 
-        this.callEvent(PermissionEntityEvent.Action.RANK_CHANGED);
+        this.callEvent(PermissionsEntityAction.RANK_CHANGED);
     }
 
     /**
@@ -124,7 +123,7 @@ public class PermissionGroup extends PermissionEntity implements Comparable<Perm
 
         this.setOption("rank-ladder", rankLadder);
 
-        this.callEvent(PermissionEntityEvent.Action.RANK_CHANGED);
+        this.callEvent(PermissionsEntityAction.RANK_CHANGED);
     }
 
     /**
@@ -271,7 +270,7 @@ public class PermissionGroup extends PermissionEntity implements Comparable<Perm
 
     public void setDefault(boolean def, String worldName) {
         setOption("default", String.valueOf(def), worldName);
-        callEvent(PermissionEntityEvent.Action.DEFAULTGROUP_CHANGED);
+        callEvent(PermissionsEntityAction.DEFAULTGROUP_CHANGED);
     }
 
     protected void clearCache() {
@@ -282,7 +281,7 @@ public class PermissionGroup extends PermissionEntity implements Comparable<Perm
     }
 
     @Override
-    public final void remove() {
+    public void remove() {
         for (String world : this.getWorlds()) {
             this.clearChildren(world);
         }

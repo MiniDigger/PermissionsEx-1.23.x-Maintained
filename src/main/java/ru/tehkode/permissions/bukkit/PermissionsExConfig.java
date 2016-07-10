@@ -112,7 +112,7 @@ public class PermissionsExConfig {
     }
 
     public List<String> getServerTags() {
-        return serverTags;
+        return Collections.unmodifiableList(serverTags);
     }
 
     public String getBasedir() {

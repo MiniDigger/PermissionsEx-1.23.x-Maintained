@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface NativeInterface {
 
     /**
-     * Converts a uuid to a name. Preferably as minimally blocking as possible.
+     * Converts a UUID to a name. Preferably as minimally blocking as possible.
      *
      * @param uid The UUID to convert to a name
      * @return The name associated with a UUID, or null if unknown
@@ -26,17 +26,17 @@ public interface NativeInterface {
     public UUID nameToUUID(String name);
 
     /**
-     * Returns whether the player associated with this uuid is online
+     * Returns whether the player associated with this UUID is online
      *
-     * @param uuid The uuid to check
-     * @return Whether this uuid is online
+     * @param uuid The UUID to check
+     * @return Whether this UUID is online
      */
     public boolean isOnline(UUID uuid);
 
     /**
      * Return the UUID associated with this server Mostly used internally
      *
-     * @return This server's uuid
+     * @return This server's UUID
      */
     public UUID getServerUUID();
 

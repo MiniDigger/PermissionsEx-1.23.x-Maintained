@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import ru.tehkode.permissions.events.PermisssionSystemAction;
 
 /**
  * PEX permissions database integration with superperms
@@ -257,7 +258,7 @@ public class SuperpermsListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onSystemEvent(PermissionSystemEvent event) {
         try {
-            if (event.getAction() == PermissionSystemEvent.Action.DEBUGMODE_TOGGLE) {
+            if (event.getAction() == PermisssionSystemAction.DEBUGMODE_TOGGLE) {
                 return;
             }
             switch (event.getAction()) {

@@ -22,13 +22,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 import ru.tehkode.permissions.commands.exceptions.AutoCompleteChoicesException;
 import ru.tehkode.utils.StringUtils;
@@ -59,7 +55,7 @@ public class CommandsManager {
                 listeners.put(cmdAnnotation.name(), commandListeners);
             }
 
-            commandListeners.put(new CommandSyntax(cmdAnnotation.syntax()), new CommandBinding(listener, method));
+            commandListeners.put(new CommandSyntax(cmdAnnotation.syntax(), this), new CommandBinding(listener, method, this));
         }
 
         listener.onRegistered(this);
@@ -136,115 +132,5 @@ public class CommandsManager {
         }
 
         return commands;
-    }
-
-    protected class CommandSyntax {
-
-        protected String originalSyntax;
-        protected String regexp;
-        protected List<String> arguments = new LinkedList<>();
-
-        public CommandSyntax(String syntax) {
-            this.originalSyntax = syntax;
-
-            this.regexp = this.prepareSyntaxRegexp(syntax);
-        }
-
-        public String getRegexp() {
-            return regexp;
-        }
-
-        private String prepareSyntaxRegexp(String syntax) {
-            String expression = syntax;
-
-            Matcher argMatcher = Pattern.compile("(?:[\\s]+)?((\\<|\\[)([^\\>\\]]+)(?:\\>|\\]))").matcher(expression);
-            //Matcher argMatcher = Pattern.compile("(\\<|\\[)([^\\>\\]]+)(?:\\>|\\])").matcher(expression);
-
-            int index = 0;
-            while (argMatcher.find()) {
-                if (argMatcher.group(2).equals("[")) {
-                    expression = expression.replace(argMatcher.group(0), "(?:(?:[\\s]+)(\"[^\"]+\"|[^\\s]+))?");
-                } else {
-                    expression = expression.replace(argMatcher.group(1), "(\"[^\"]+\"|[\\S]+)");
-                }
-
-                arguments.add(index++, argMatcher.group(3));
-            }
-
-            return expression;
-        }
-
-        public boolean isMatch(String str) {
-            return str.matches(this.regexp);
-        }
-
-        public Map<String, String> getMatchedArguments(String str) {
-            Map<String, String> matchedArguments = new HashMap<>(this.arguments.size());
-
-            if (this.arguments.size() > 0) {
-                Matcher argMatcher = Pattern.compile(this.regexp).matcher(str);
-
-                if (argMatcher.find()) {
-                    for (int index = 1; index <= argMatcher.groupCount(); index++) {
-                        String argumentValue = argMatcher.group(index);
-                        if (argumentValue == null || argumentValue.isEmpty()) {
-                            continue;
-                        }
-
-                        if (argumentValue.startsWith("\"") && argumentValue.endsWith("\"")) { // Trim boundary colons
-                            argumentValue = argumentValue.substring(1, argumentValue.length() - 1);
-                        }
-
-                        matchedArguments.put(this.arguments.get(index - 1), argumentValue);
-                    }
-                }
-            }
-            return matchedArguments;
-        }
-    }
-
-    public class CommandBinding {
-
-        protected Object object;
-        protected Method method;
-        protected Map<String, String> params = new HashMap<>();
-
-        public CommandBinding(Object object, Method method) {
-            this.object = object;
-            this.method = method;
-        }
-
-        public Command getMethodAnnotation() {
-            return this.method.getAnnotation(Command.class);
-        }
-
-        public Map<String, String> getParams() {
-            return params;
-        }
-
-        public void setParams(Map<String, String> params) {
-            this.params = params;
-        }
-
-        public boolean checkPermissions(Player player) {
-            PermissionManager manager = PermissionsEx.getPermissionManager();
-
-            String permission = this.getMethodAnnotation().permission();
-
-            if (permission.contains("<")) {
-                for (Entry<String, String> entry : this.getParams().entrySet()) {
-                    if (entry.getValue() != null) {
-                        permission = permission.replace("<" + entry.getKey() + ">", entry.getValue().toLowerCase());
-                    }
-                }
-            }
-
-            return manager.has(player, permission);
-
-        }
-
-        public void call(Object... args) throws Exception {
-            this.method.invoke(object, args);
-        }
     }
 }

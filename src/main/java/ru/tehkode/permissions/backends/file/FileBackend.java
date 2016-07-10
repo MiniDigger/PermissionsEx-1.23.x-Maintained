@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import org.bukkit.configuration.InvalidConfigurationException;
 
 /**
  * @author code
@@ -319,7 +320,7 @@ public class FileBackend extends PermissionBackend {
                 this.permissions = newPermissions;
                 initNewConfiguration();
             }
-        } catch (Throwable e) {
+        } catch (IOException | InvalidConfigurationException e) {
             throw new PermissionBackendException("Error loading permissions file!", e);
         }
     }

@@ -123,7 +123,7 @@ public class StringUtils {
     /**
      * Parse a string to an integer value, using a given default on fail
      *
-     * @param value a String to parse to an int
+     * @param value a String to parse to an integer
      * @param defaultValue the default, used when 'value' is not an integer
      * @return the parsed value
      */
@@ -134,5 +134,9 @@ public class StringUtils {
         } catch (NumberFormatException e) {
         }
         return ret;
+    }
+
+    private StringUtils() {
+        throw new AssertionError("Instantiating something you shouldnt be! Get out.");
     }
 }

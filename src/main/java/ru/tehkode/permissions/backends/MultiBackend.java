@@ -47,7 +47,8 @@ public class MultiBackend extends PermissionBackend {
         if (fallbackSection != null) {
             for (Map.Entry<String, Object> ent : fallbackSection.getValues(false).entrySet()) {
                 @SuppressWarnings("SuspiciousMethodCalls")
-                PermissionBackend backend = backendMap.get(ent.getValue());
+                PermissionBackend backend;
+                backend = backendMap.get(ent.getValue());
                 if (backend == null) {
                     throw new PermissionBackendException("Fallback backend type " + ent.getValue() + " is not listed in the backends section of MultiBackend (and must be for this contraption to work)");
                 }
@@ -173,6 +174,7 @@ public class MultiBackend extends PermissionBackend {
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "unchecked"})
     public void writeContents(Writer writer) throws IOException {
         JSONObject obj = new JSONObject();
         for (PermissionBackend backend : backends) {

@@ -28,4 +28,8 @@ public class DateUtils {
 
         return Interval.byLabel(type).value();
     }
+
+    private DateUtils() {
+        throw new AssertionError("Instantiating something you shouldnt be! Get out.");
+    }
 }

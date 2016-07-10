@@ -95,11 +95,16 @@ public class PermissionList extends HashMap<String, Permission> {
         return ImmutableSet.copyOf(childParentMapping.get(permission.toLowerCase()));
     }
 
+    @Override
+    public Object clone() {
+        return super.clone();
+    }
+
     private class NotifyingChildrenMap extends LinkedHashMap<String, Boolean> {
         
         private final Permission perm;
 
-        public NotifyingChildrenMap(Permission perm) {
+        NotifyingChildrenMap(Permission perm) {
             super(perm.getChildren());
             this.perm = perm;
         }
@@ -129,6 +134,11 @@ public class PermissionList extends HashMap<String, Permission> {
         public void clear() {
             removeAllChildren(perm.getName());
             super.clear();
+        }
+
+        @Override
+        public Object clone() {
+            return super.clone();
         }
     }
 }

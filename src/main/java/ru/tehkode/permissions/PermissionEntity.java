@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
 import ru.tehkode.permissions.events.PermissionEntityEvent;
+import ru.tehkode.permissions.events.PermissionsEntityAction;
 
 /**
  * @author code
@@ -82,7 +83,7 @@ public abstract class PermissionEntity {
     /*protected void setName(String name) {
      setOption("name", name);
      }*/
-    public abstract Type getType();
+    public abstract PermissionsEntityType getType();
 
     /**
      * Return non-inherited user prefix. This means if at entity don't have has
@@ -147,7 +148,7 @@ public abstract class PermissionEntity {
     public void setPrefix(String prefix, String worldName) {
         getData().setOption("prefix", prefix, worldName);
         clearCache();
-        this.callEvent(PermissionEntityEvent.Action.INFO_CHANGED);
+        this.callEvent(PermissionsEntityAction.INFO_CHANGED);
     }
 
     /**
@@ -180,7 +181,7 @@ public abstract class PermissionEntity {
     public void setSuffix(String suffix, String worldName) {
         getData().setOption("suffix", suffix, worldName);
         clearCache();
-        this.callEvent(PermissionEntityEvent.Action.INFO_CHANGED);
+        this.callEvent(PermissionsEntityAction.INFO_CHANGED);
     }
 
     /**
@@ -258,7 +259,8 @@ public abstract class PermissionEntity {
     protected List<String> getPermissionsInternal(String worldName) {
         final List<String> ret = new ArrayList<>();
 
-        new HierarchyTraverser<Void>(this, worldName) {
+        Void traverse;
+        traverse = new HierarchyTraverser<Void>(this, worldName) {
             @Override
             protected Void fetchLocal(PermissionEntity entity, String world) {
                 for (String perm : entity.getOwnPermissions(world)) {
@@ -373,7 +375,7 @@ public abstract class PermissionEntity {
     public void setPermissions(List<String> permissions, String world) {
         getData().setPermissions(permissions, world);
         clearCache();
-        this.callEvent(PermissionEntityEvent.Action.PERMISSIONS_CHANGED);
+        this.callEvent(PermissionsEntityAction.PERMISSIONS_CHANGED);
     }
 
     /**
@@ -498,7 +500,7 @@ public abstract class PermissionEntity {
     public void setOption(String option, String value, String world) {
         getData().setOption(option, value, world);
         clearCache();
-        this.callEvent(PermissionEntityEvent.Action.OPTIONS_CHANGED);
+        this.callEvent(PermissionsEntityAction.OPTIONS_CHANGED);
     }
 
     /**
@@ -602,7 +604,7 @@ public abstract class PermissionEntity {
     public void save() {
         getData().save();
         clearCache();
-        this.callEvent(PermissionEntityEvent.Action.SAVED);
+        this.callEvent(PermissionsEntityAction.SAVED);
     }
 
     /**
@@ -611,7 +613,7 @@ public abstract class PermissionEntity {
     public void remove() {
         getData().remove();
         clearCache();
-        this.callEvent(PermissionEntityEvent.Action.REMOVED);
+        this.callEvent(PermissionsEntityAction.REMOVED);
     }
 
     /**
@@ -706,7 +708,7 @@ public abstract class PermissionEntity {
         }
 
         clearCache();
-        this.callEvent(PermissionEntityEvent.Action.PERMISSIONS_CHANGED);
+        this.callEvent(PermissionsEntityAction.PERMISSIONS_CHANGED);
     }
 
     /**
@@ -728,14 +730,14 @@ public abstract class PermissionEntity {
         this.timedPermissionsTime.remove(world + ":" + permission);
 
         clearCache();
-        this.callEvent(PermissionEntityEvent.Action.PERMISSIONS_CHANGED);
+        this.callEvent(PermissionsEntityAction.PERMISSIONS_CHANGED);
     }
 
     protected void callEvent(PermissionEntityEvent event) {
         manager.callEvent(event);
     }
 
-    protected void callEvent(PermissionEntityEvent.Action action) {
+    protected void callEvent(PermissionsEntityAction action) {
         this.callEvent(new PermissionEntityEvent(manager.getServerUUID(), this, action));
     }
 
@@ -931,15 +933,11 @@ public abstract class PermissionEntity {
     public void setParentsIdentifier(List<String> parentNames, String world) {
         getData().setParents(parentNames, world);
         clearCache();
-        this.callEvent(PermissionEntityEvent.Action.INHERITANCE_CHANGED);
+        this.callEvent(PermissionsEntityAction.INHERITANCE_CHANGED);
     }
 
     public void setParentsIdentifier(List<String> parentNames) {
         setParentsIdentifier(parentNames, null);
     }
 
-    public static enum Type {
-
-        USER, GROUP
-    }
 }

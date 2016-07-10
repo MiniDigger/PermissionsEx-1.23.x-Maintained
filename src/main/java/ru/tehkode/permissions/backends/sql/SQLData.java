@@ -21,28 +21,26 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class SQLData implements PermissionsUserData, PermissionsGroupData {
 
-    public static Set<String> getEntitiesNames(SQLConnection sql, Type type, boolean defaultOnly) throws SQLException {
+    public static Set<String> getEntitiesNames(SQLConnection sql, SQLDataType type, boolean defaultOnly) throws SQLException {
         Set<String> entities = new HashSet<>();
 
-        ResultSet result = sql.prepAndBind("SELECT `name` FROM `{permissions_entity}` WHERE `type` = ? " + (defaultOnly ? " AND `default` = 1" : ""), type.ordinal()).executeQuery();
-
-        while (result.next()) {
-            entities.add(result.getString("name"));
+        try (ResultSet result = sql.prepAndBind("SELECT `name` FROM `{permissions_entity}` WHERE `type` = ? " + (defaultOnly ? " AND `default` = 1" : ""), type.ordinal()).executeQuery()) {
+            while (result.next()) {
+                entities.add(result.getString("name"));
+            }
         }
-
-        result.close();
 
         return Collections.unmodifiableSet(entities);
     }
 
     private String identifier;
-    private final Type type;
+    private final SQLDataType type;
     private final SQLBackend backend;
 
     // Cache
     private final AtomicBoolean virtual = new AtomicBoolean(true);
 
-    public SQLData(String identifier, Type type, SQLBackend backend) {
+    public SQLData(String identifier, SQLDataType type, SQLBackend backend) {
         this.identifier = identifier;
         this.type = type;
         this.backend = backend;
@@ -84,8 +82,8 @@ public class SQLData implements PermissionsUserData, PermissionsGroupData {
             throw new RuntimeException(e);
         }
     }
-    // Interface methods
 
+    // Interface methods
     public String getIdentifier() {
         return identifier;
     }
@@ -385,13 +383,7 @@ public class SQLData implements PermissionsUserData, PermissionsGroupData {
     public void load() { // Nothing to load, we don't handle caching!
     }
 
-    public Type getType() {
+    public SQLDataType getType() {
         return type;
     }
-
-    public enum Type {
-
-        GROUP, USER, WORLD
-    }
-
 }

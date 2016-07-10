@@ -68,10 +68,10 @@ public class ErrorReport {
 
             String urlParameters = "url=" + URLEncoder.encode(longUrl, UTF8_ENCODING);
 
-            DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
+            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
+                wr.writeBytes(urlParameters);
+                wr.flush();
+            }
 
             BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line;
@@ -168,7 +168,7 @@ public class ErrorReport {
 
     // Factory methods
     public static ErrorReport withException(String cause, Throwable error) {
-        Builder builder = builder(error);
+        ErrorReportBuilder builder = builder(error);
 
         PermissionsEx pexPlugin = (PermissionsEx) PermissionsEx.getPlugin();
         builder.addHeading("Basic info")
@@ -283,8 +283,8 @@ public class ErrorReport {
         return builder.build();
     }
 
-    public static Builder builder(Throwable error) {
-        return new Builder("", error);
+    public static ErrorReportBuilder builder(Throwable error) {
+        return new ErrorReportBuilder("", error);
     }
 
     private String shortURL;
@@ -293,7 +293,7 @@ public class ErrorReport {
     private final Throwable error;
 
     // Main report
-    private ErrorReport(String title, String message, Throwable error) {
+    ErrorReport(String title, String message, Throwable error) {
         this.title = title;
         this.message = message;
         this.error = error;
@@ -334,55 +334,4 @@ public class ErrorReport {
         return build.toString();
     }
 
-    public static class Builder {
-
-        private final String name;
-        private final StringBuilder message = new StringBuilder();
-        private final Throwable error;
-
-        private Builder(String name, Throwable error) {
-            this.name = name;
-            this.error = error;
-        }
-
-        public Builder addHeading(String text) {
-            message.append("### ").append(text).append(" ###\n");
-            return this;
-        }
-
-        public Builder addText(String text) {
-            message.append('\n').append(text).append('\n');
-            return this;
-        }
-
-        public Builder addCode(String text, String format) {
-            message.append("```");
-            if (format != null) {
-                message.append(format);
-            }
-            message.append('\n').append(text).append("\n```\n");
-            return this;
-        }
-
-        public ErrorReport build() {
-            Builder builder = new Builder(name, error);
-            builder.addHeading("Description")
-                    .addText("[Insert description of issue here]");
-            builder.addHeading("Detailed Information");
-            if (new File("plugins" + File.separator + "PermissionsEx", "report-disable").exists()) {
-                builder.addText("I am stupid and chose to disable error reporting, therefore removing any chance of getting help with my error");
-            } else {
-                builder.addText("[Is available here](" + gistText(this.message.toString()) + ")");
-            }
-            return new ErrorReport(this.name, builder.message.toString(), error);
-        }
-    }
-
-    public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
-
-        @Override
-        public void uncaughtException(Thread t, Throwable e) {
-            handleError("Unknown error in thread " + t.getName() + "-" + t.getId(), e);
-        }
-    }
 }

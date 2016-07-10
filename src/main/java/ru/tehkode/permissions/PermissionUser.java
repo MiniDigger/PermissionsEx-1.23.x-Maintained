@@ -28,6 +28,7 @@ import ru.tehkode.permissions.exceptions.RankingException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
+import ru.tehkode.permissions.events.PermissionsEntityAction;
 
 /**
  * @author code
@@ -90,8 +91,8 @@ public class PermissionUser extends PermissionEntity {
     }
 
     @Override
-    public Type getType() {
-        return Type.USER;
+    public PermissionsEntityType getType() {
+        return PermissionsEntityType.USER;
     }
 
     @Override
@@ -363,7 +364,7 @@ public class PermissionUser extends PermissionEntity {
 
         this.swapGroups(sourceGroup, targetGroup);
 
-        this.callEvent(PermissionEntityEvent.Action.RANK_CHANGED);
+        this.callEvent(PermissionsEntityAction.RANK_CHANGED);
 
         return targetGroup;
     }
@@ -414,7 +415,7 @@ public class PermissionUser extends PermissionEntity {
 
         this.swapGroups(sourceGroup, targetGroup);
 
-        this.callEvent(PermissionEntityEvent.Action.RANK_CHANGED);
+        this.callEvent(PermissionsEntityAction.RANK_CHANGED);
 
         return targetGroup;
     }

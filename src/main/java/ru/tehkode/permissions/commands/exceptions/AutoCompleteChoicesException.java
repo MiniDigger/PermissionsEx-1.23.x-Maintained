@@ -34,6 +34,6 @@ public class AutoCompleteChoicesException extends RuntimeException {
     }
 
     public String[] getChoices() {
-        return this.choices;
+        return this.choices; //TODO: Is passing of Array is safe?
     }
 }

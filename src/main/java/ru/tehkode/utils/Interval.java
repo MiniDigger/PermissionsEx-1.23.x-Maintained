@@ -29,7 +29,7 @@ public enum Interval {
     }
 
     public String[] labels() {
-        return this.labels;
+        return this.labels;  //TODO: Make sure return of array field is safe....
     }
 
     public static Interval byLabel(String label) {

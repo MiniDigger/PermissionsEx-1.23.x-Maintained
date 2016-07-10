@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,7 +36,6 @@ import java.util.logging.Logger;
 public abstract class PermissionBackend {
 
     // -- Backend lookup/creation
-
     public static final String DEFAULT_BACKEND = "file";
     /**
      * Array of backend aliases
@@ -244,7 +242,7 @@ public abstract class PermissionBackend {
                     }
                     update.performUpdate();
                     newVersion = Math.max(update.getUpdateVersion(), newVersion);
-                } catch (Throwable t) {
+                } catch (IOException | PermissionBackendException t) {
                     ErrorReport.handleError("While updating to " + update.getUpdateVersion() + " from " + newVersion, t);
                     break;
                 }
@@ -360,7 +358,7 @@ public abstract class PermissionBackend {
         }
     }
 
-    public final Logger getLogger() {
+    public Logger getLogger() {
         return manager.getLogger();
     }
 

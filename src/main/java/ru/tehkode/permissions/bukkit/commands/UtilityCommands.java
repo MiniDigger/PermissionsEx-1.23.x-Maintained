@@ -33,7 +33,7 @@ import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.ErrorReport;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 import ru.tehkode.permissions.commands.Command;
-import ru.tehkode.permissions.commands.CommandsManager.CommandBinding;
+import ru.tehkode.permissions.commands.CommandBinding;
 import ru.tehkode.permissions.exceptions.PermissionBackendException;
 
 import java.io.File;

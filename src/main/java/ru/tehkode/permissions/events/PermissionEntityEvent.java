@@ -21,8 +21,8 @@ package ru.tehkode.permissions.events;
 import org.bukkit.event.HandlerList;
 import ru.tehkode.permissions.PermissionEntity;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
-
 import java.util.UUID;
+import ru.tehkode.permissions.PermissionsEntityType;
 
 /**
  * @author t3hk0d3
@@ -35,11 +35,11 @@ public class PermissionEntityEvent extends PermissionEvent {
         return handlers;
     }
     protected transient PermissionEntity entity;
-    protected Action action;
-    protected PermissionEntity.Type type;
+    protected PermissionsEntityAction action;
+    protected PermissionsEntityType type;
     protected String entityIdentifier;
 
-    public PermissionEntityEvent(UUID sourceUUID, PermissionEntity entity, Action action) {
+    public PermissionEntityEvent(UUID sourceUUID, PermissionEntity entity, PermissionsEntityAction action) {
         super(sourceUUID);
         this.entity = entity;
         this.entityIdentifier = entity.getIdentifier();
@@ -47,7 +47,7 @@ public class PermissionEntityEvent extends PermissionEvent {
         this.action = action;
     }
 
-    public Action getAction() {
+    public PermissionsEntityAction getAction() {
         return this.action;
     }
 
@@ -69,18 +69,12 @@ public class PermissionEntityEvent extends PermissionEvent {
         return entityIdentifier;
     }
 
-    public PermissionEntity.Type getType() {
+    public PermissionsEntityType getType() {
         return type;
     }
-
 
     @Override
     public HandlerList getHandlers() {
         return handlers;
-    }
-
-    public enum Action {
-
-        PERMISSIONS_CHANGED, OPTIONS_CHANGED, INHERITANCE_CHANGED, INFO_CHANGED, TIMEDPERMISSION_EXPIRED, RANK_CHANGED, DEFAULTGROUP_CHANGED, WEIGHT_CHANGED, SAVED, REMOVED
     }
 }

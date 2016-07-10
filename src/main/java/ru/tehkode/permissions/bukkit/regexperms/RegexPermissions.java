@@ -20,15 +20,15 @@ import static ru.tehkode.permissions.bukkit.CraftBukkitInterface.getCBClassName;
  */
 public class RegexPermissions {
     protected static final PermissibleInjector[] injectors = new PermissibleInjector[]{
-        new PermissibleInjector.ClassPresencePermissibleInjector("net.glowstone.entity.GlowHumanEntity", "permissions", true),
-        new PermissibleInjector.ClassPresencePermissibleInjector("org.getspout.server.entity.SpoutHumanEntity", "permissions", true),
-        new PermissibleInjector.ClassNameRegexPermissibleInjector("org.getspout.spout.player.SpoutCraftPlayer", "perm", false, "org\\.getspout\\.spout\\.player\\.SpoutCraftPlayer"),
-        new PermissibleInjector.ClassPresencePermissibleInjector(getCBClassName("entity.CraftHumanEntity"), "perm", true),};
+        new ClassPresencePermissibleInjector("net.glowstone.entity.GlowHumanEntity", "permissions", true),
+        new ClassPresencePermissibleInjector("org.getspout.server.entity.SpoutHumanEntity", "permissions", true),
+        new RegexPermissibleInjector("org.getspout.spout.player.SpoutCraftPlayer", "perm", false, "org\\.getspout\\.spout\\.player\\.SpoutCraftPlayer"),
+        new ClassPresencePermissibleInjector(getCBClassName("entity.CraftHumanEntity"), "perm", true),};
 
     private final PermissionsEx plugin;
-    private PermissionList permsList;
+    private final PermissionList permsList;
     // Permissions subscriptions handling
-    private PEXPermissionSubscriptionMap subscriptionHandler;
+    private final PEXPermissionSubscriptionMap subscriptionHandler;
 
     public RegexPermissions(PermissionsEx plugin) {
         this.plugin = plugin;
@@ -85,7 +85,7 @@ public class RegexPermissions {
             if (success && hasDebugMode()) {
                 plugin.getLogger().info("Permissions handler for " + player.getName() + " successfully injected");
             }
-        } catch (Throwable e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             plugin.getLogger().log(Level.SEVERE, "Unable to inject permissible for " + player.getName(), e);
         }
     }
@@ -152,9 +152,7 @@ public class RegexPermissions {
                     injectAllPermissibles();
                     break;
                 default:
-                    return;
             }
         }
     }
-
 }

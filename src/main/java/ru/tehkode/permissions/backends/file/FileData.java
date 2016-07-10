@@ -261,7 +261,7 @@ public class FileData implements PermissionsUserData, PermissionsGroupData {
             }
         }
 
-        if (parents == null || parents.isEmpty()) {
+        if (parents.isEmpty()) {
             return Collections.emptyList();
         }
 

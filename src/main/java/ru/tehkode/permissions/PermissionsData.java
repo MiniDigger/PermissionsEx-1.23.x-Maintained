@@ -7,7 +7,7 @@ import java.util.Set;
 public interface PermissionsData {
 
     /**
-     * Preload data from entity
+     * Pre-load data from entity
      */
     public void load();
 

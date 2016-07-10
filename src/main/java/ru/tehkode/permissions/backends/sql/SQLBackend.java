@@ -215,7 +215,7 @@ public class SQLBackend extends PermissionBackend {
     @Override
     public int getSchemaVersion() {
         try (SQLConnection conn = getSQL()) {
-            ResultSet res = conn.prepAndBind("entity.options.get", "system", SQLData.Type.WORLD.ordinal(), "schema_version", "").executeQuery();
+            ResultSet res = conn.prepAndBind("entity.options.get", "system", SQLDataType.WORLD.ordinal(), "schema_version", "").executeQuery();
             if (!res.next()) {
                 return -1;
             }
@@ -228,8 +228,8 @@ public class SQLBackend extends PermissionBackend {
     @Override
     protected void setSchemaVersion(int version) {
         try (SQLConnection conn = getSQL()) {
-            conn.prepAndBind("entity.options.delete", "system", "schema_version", SQLData.Type.WORLD.ordinal(), "").execute();
-            conn.prepAndBind("entity.options.add", "system", SQLData.Type.WORLD.ordinal(), "schema_version", "", version).execute();
+            conn.prepAndBind("entity.options.delete", "system", "schema_version", SQLDataType.WORLD.ordinal(), "").execute();
+            conn.prepAndBind("entity.options.add", "system", SQLDataType.WORLD.ordinal(), "schema_version", "", version).execute();
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -261,14 +261,14 @@ public class SQLBackend extends PermissionBackend {
 
     @Override
     public PermissionsUserData getUserData(String name) {
-        CachingUserData data = new CachingUserData(new SQLData(name, SQLData.Type.USER, this), getExecutor(), new Object());
+        CachingUserData data = new CachingUserData(new SQLData(name, SQLDataType.USER, this), getExecutor(), new Object());
         updateNameCache(userNamesCache, data);
         return data;
     }
 
     @Override
     public PermissionsGroupData getGroupData(String name) {
-        CachingGroupData data = new CachingGroupData(new SQLData(name, SQLData.Type.GROUP, this), getExecutor(), new Object());
+        CachingGroupData data = new CachingGroupData(new SQLData(name, SQLDataType.GROUP, this), getExecutor(), new Object());
         updateNameCache(groupNamesCache, data);
         return data;
     }
@@ -318,7 +318,7 @@ public class SQLBackend extends PermissionBackend {
      * @param type The type to get
      * @return A set of known entity names
      */
-    private ImmutableSet<String> getEntityNames(AtomicReference<ImmutableSet<String>> cacheRef, SQLData.Type type) {
+    private ImmutableSet<String> getEntityNames(AtomicReference<ImmutableSet<String>> cacheRef, SQLDataType type) {
         while (true) {
             ImmutableSet<String> cache = cacheRef.get();
             if (cache != null) {
@@ -339,7 +339,7 @@ public class SQLBackend extends PermissionBackend {
     @Override
     public boolean hasUser(String userName) {
         try (SQLConnection conn = getSQL()) {
-            ResultSet res = conn.prepAndBind("entity.exists", userName, SQLData.Type.USER.ordinal()).executeQuery();
+            ResultSet res = conn.prepAndBind("entity.exists", userName, SQLDataType.USER.ordinal()).executeQuery();
             return res.next();
         } catch (SQLException | IOException e) {
             return false;
@@ -349,7 +349,7 @@ public class SQLBackend extends PermissionBackend {
     @Override
     public boolean hasGroup(String group) {
         try (SQLConnection conn = getSQL()) {
-            ResultSet res = conn.prepAndBind("entity.exists", group, SQLData.Type.GROUP.ordinal()).executeQuery();
+            ResultSet res = conn.prepAndBind("entity.exists", group, SQLDataType.GROUP.ordinal()).executeQuery();
             return res.next();
         } catch (SQLException | IOException e) {
             return false;
@@ -358,12 +358,12 @@ public class SQLBackend extends PermissionBackend {
 
     @Override
     public Collection<String> getGroupNames() {
-        return getEntityNames(groupNamesCache, SQLData.Type.GROUP);
+        return getEntityNames(groupNamesCache, SQLDataType.GROUP);
     }
 
     @Override
     public Collection<String> getUserIdentifiers() {
-        return getEntityNames(userNamesCache, SQLData.Type.USER);
+        return getEntityNames(userNamesCache, SQLDataType.USER);
     }
 
     @Override
@@ -371,7 +371,7 @@ public class SQLBackend extends PermissionBackend {
         // TODO: Look at implementing caching
         Set<String> ret = new HashSet<>();
         try (SQLConnection conn = getSQL()) {
-            ResultSet set = conn.prepAndBind("SELECT `value` FROM `{permissions}` WHERE `type` = ? AND `permission` = 'name' AND `value` IS NOT NULL", SQLData.Type.USER.ordinal()).executeQuery();
+            ResultSet set = conn.prepAndBind("SELECT `value` FROM `{permissions}` WHERE `type` = ? AND `permission` = 'name' AND `value` IS NOT NULL", SQLDataType.USER.ordinal()).executeQuery();
             while (set.next()) {
                 ret.add(set.getString("value"));
             }
@@ -443,7 +443,7 @@ public class SQLBackend extends PermissionBackend {
 
         if (!worldInheritanceCache.containsKey(world)) {
             try (SQLConnection conn = getSQL()) {
-                ResultSet result = conn.prepAndBind("SELECT `parent` FROM `{permissions_inheritance}` WHERE `child` = ? AND `type` = ?;", world, SQLData.Type.WORLD.ordinal()).executeQuery();
+                ResultSet result = conn.prepAndBind("SELECT `parent` FROM `{permissions_inheritance}` WHERE `child` = ? AND `type` = ?;", world, SQLDataType.WORLD.ordinal()).executeQuery();
                 LinkedList<String> worldParents = new LinkedList<>();
 
                 while (result.next()) {
@@ -462,7 +462,7 @@ public class SQLBackend extends PermissionBackend {
     @Override
     public Map<String, List<String>> getAllWorldInheritance() {
         try (SQLConnection conn = getSQL()) {
-            ResultSet result = conn.prepAndBind("SELECT `child` FROM `{permissions_inheritance}` WHERE `type` = ?", SQLData.Type.WORLD.ordinal()).executeQuery();
+            ResultSet result = conn.prepAndBind("SELECT `child` FROM `{permissions_inheritance}` WHERE `type` = ?", SQLDataType.WORLD.ordinal()).executeQuery();
 
             Map<String, List<String>> ret = new HashMap<>();
             while (result.next()) {
@@ -484,9 +484,9 @@ public class SQLBackend extends PermissionBackend {
         }
 
         try (SQLConnection conn = getSQL()) {
-            conn.prepAndBind("DELETE FROM `{permissions_inheritance}` WHERE `child` = ? AND `type` = ?", worldName, SQLData.Type.WORLD.ordinal()).execute();
+            conn.prepAndBind("DELETE FROM `{permissions_inheritance}` WHERE `child` = ? AND `type` = ?", worldName, SQLDataType.WORLD.ordinal()).execute();
 
-            PreparedStatement statement = conn.prepAndBind("INSERT INTO `{permissions_inheritance}` (`child`, `parent`, `type`) VALUES (?, ?, ?)", worldName, "toset", SQLData.Type.WORLD.ordinal());
+            PreparedStatement statement = conn.prepAndBind("INSERT INTO `{permissions_inheritance}` (`child`, `parent`, `type`) VALUES (?, ?, ?)", worldName, "toset", SQLDataType.WORLD.ordinal());
             for (String parentWorld : parentWorlds) {
                 statement.setString(2, parentWorld);
                 statement.addBatch();

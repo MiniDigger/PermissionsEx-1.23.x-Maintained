@@ -55,7 +55,7 @@ public class PEXPermissionSubscriptionMap extends HashMap<String, Map<Permissibl
             return INSTANCE.get();
         }
     }
-    private final PermissionsEx plugin;
+    final PermissionsEx plugin;
     private final PluginManager manager;
 
     private PEXPermissionSubscriptionMap(PermissionsEx plugin, PluginManager manager, Map<String, Map<Permissible, Boolean>> backing) {
@@ -72,7 +72,7 @@ public class PEXPermissionSubscriptionMap extends HashMap<String, Map<Permissibl
             Map<String, Map<Permissible, Boolean>> unwrappedMap = new HashMap<>(this.size());
             for (Map.Entry<String, Map<Permissible, Boolean>> entry : this.entrySet()) {
                 if (entry.getValue() instanceof PEXSubscriptionValueMap) {
-                    unwrappedMap.put(entry.getKey(), ((PEXSubscriptionValueMap) entry.getValue()).backing);
+                    Map<Permissible, Boolean> put = unwrappedMap.put(entry.getKey(), ((PEXSubscriptionValueMap) entry.getValue()).backing);
                 }
             }
             INJECTOR.set(manager, unwrappedMap);
@@ -87,10 +87,10 @@ public class PEXPermissionSubscriptionMap extends HashMap<String, Map<Permissibl
 
         Map<Permissible, Boolean> result = super.get(key);
         if (result == null) {
-            result = new PEXSubscriptionValueMap((String) key, new WeakHashMap<Permissible, Boolean>());
+            result = new PEXSubscriptionValueMap((String) key, new WeakHashMap<Permissible, Boolean>(), this);
             super.put((String) key, result);
         } else if (!(result instanceof PEXSubscriptionValueMap)) {
-            result = new PEXSubscriptionValueMap((String) key, result);
+            result = new PEXSubscriptionValueMap((String) key, result, this);
             super.put((String) key, result);
         }
         return result;
@@ -99,92 +99,14 @@ public class PEXPermissionSubscriptionMap extends HashMap<String, Map<Permissibl
     @Override
     public Map<Permissible, Boolean> put(String key, Map<Permissible, Boolean> value) {
         if (!(value instanceof PEXSubscriptionValueMap)) {
-            value = new PEXSubscriptionValueMap(key, value);
+            value = new PEXSubscriptionValueMap(key, value, this);
         }
         return super.put(key, value);
     }
 
-    public class PEXSubscriptionValueMap implements Map<Permissible, Boolean> {
-
-        private final String permission;
-        private final Map<Permissible, Boolean> backing;
-
-        public PEXSubscriptionValueMap(String permission, Map<Permissible, Boolean> backing) {
-            this.permission = permission;
-            this.backing = backing;
-        }
-
-        @Override
-        public int size() {
-            return backing.size();
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return backing.isEmpty();
-        }
-
-        @Override
-        public boolean containsKey(Object key) {
-            return backing.containsKey(key) || (key instanceof Permissible && ((Permissible) key).isPermissionSet(permission));
-        }
-
-        @Override
-        public boolean containsValue(Object value) {
-            return backing.containsValue(value);
-        }
-
-        @Override
-        public Boolean put(Permissible key, Boolean value) {
-            return backing.put(key, value);
-        }
-
-        @Override
-        public Boolean remove(Object key) {
-            return backing.remove(key);
-        }
-
-        @Override
-        public void putAll(Map<? extends Permissible, ? extends Boolean> m) {
-            backing.putAll(m);
-        }
-
-        @Override
-        public void clear() {
-            backing.clear();
-        }
-
-        @Override
-        public Boolean get(Object key) {
-            if (key instanceof Permissible) {
-                Permissible p = (Permissible) key;
-                if (p.isPermissionSet(permission)) {
-                    return p.hasPermission(permission);
-                }
-            }
-            return backing.get(key);
-        }
-
-        @Override
-        public Set<Permissible> keySet() {
-            Collection<? extends Player> players = plugin.getServer().getOnlinePlayers();
-            Set<Permissible> pexMatches = new HashSet<Permissible>(players.size());
-            for (Player player : players) {
-                if (player.hasPermission(permission)) {
-                    pexMatches.add(player);
-                }
-            }
-            return Sets.union(pexMatches, backing.keySet());
-        }
-
-        @Override
-        public Collection<Boolean> values() {
-            return backing.values();
-        }
-
-        @Override
-        public Set<Entry<Permissible, Boolean>> entrySet() {
-            return backing.entrySet();
-        }
+    @Override
+    public Object clone() {
+        return super.clone();
     }
+
 }
