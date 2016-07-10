@@ -132,6 +132,7 @@ public abstract class PermissionEntity {
     /**
      * Returns entity prefix
      *
+     * @return 
      */
     public String getPrefix() {
         return this.getPrefix(null);
@@ -141,6 +142,7 @@ public abstract class PermissionEntity {
      * Set prefix to value
      *
      * @param prefix new prefix
+     * @param worldName
      */
     public void setPrefix(String prefix, String worldName) {
         getData().setOption("prefix", prefix, worldName);
@@ -151,6 +153,7 @@ public abstract class PermissionEntity {
     /**
      * Return entity suffix
      *
+     * @param worldName
      * @return suffix
      */
     public String getSuffix(String worldName) {
@@ -172,6 +175,7 @@ public abstract class PermissionEntity {
      * Set suffix to value
      *
      * @param suffix new suffix
+     * @param worldName
      */
     public void setSuffix(String suffix, String worldName) {
         getData().setOption("suffix", suffix, worldName);

@@ -122,6 +122,7 @@ public abstract class PermissionBackend {
      * @param backendName Class name or alias of backend
      * @param config Configuration object to access backend settings
      * @return new instance of PermissionBackend object
+     * @throws ru.tehkode.permissions.exceptions.PermissionBackendException
      */
     public static PermissionBackend getBackend(String backendName, Configuration config) throws PermissionBackendException {
         return getBackend(backendName, PermissionsEx.getPermissionManager(), config, DEFAULT_BACKEND);
@@ -134,6 +135,7 @@ public abstract class PermissionBackend {
      * @param manager PermissionManager object
      * @param config Configuration object to access backend settings
      * @return new instance of PermissionBackend object
+     * @throws ru.tehkode.permissions.exceptions.PermissionBackendException
      */
     public static PermissionBackend getBackend(String backendName, PermissionManager manager, ConfigurationSection config) throws PermissionBackendException {
         return getBackend(backendName, manager, config, DEFAULT_BACKEND);
@@ -148,6 +150,7 @@ public abstract class PermissionBackend {
      * @param fallBackBackend name of backend that should be used if specified
      * backend was not found or failed to initialize
      * @return new instance of PermissionBackend object
+     * @throws ru.tehkode.permissions.exceptions.PermissionBackendException
      */
     public static PermissionBackend getBackend(String backendName, PermissionManager manager, ConfigurationSection config, String fallBackBackend) throws PermissionBackendException {
         if (backendName == null || backendName.isEmpty()) {
@@ -415,6 +418,7 @@ public abstract class PermissionBackend {
      * Allow this backend to write its contents to a file.
      *
      * @param writer The writer to dump contents to.
+     * @throws java.io.IOException
      */
     public abstract void writeContents(Writer writer) throws IOException;
 

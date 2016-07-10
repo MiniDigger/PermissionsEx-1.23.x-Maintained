@@ -135,6 +135,7 @@ public class PermissionUser extends PermissionEntity {
      * Add user to group
      *
      * @param groupName group's name as String
+     * @param worldName
      */
     public void addGroup(String groupName, String worldName) {
         if (groupName == null || groupName.isEmpty()) {
@@ -164,6 +165,7 @@ public class PermissionUser extends PermissionEntity {
      * Add user to group
      *
      * @param group as PermissionGroup object
+     * @param worldName
      */
     public void addGroup(PermissionGroup group, String worldName) {
         if (group == null) {
@@ -190,6 +192,7 @@ public class PermissionUser extends PermissionEntity {
      * Remove user from group
      *
      * @param groupName group's name as String
+     * @param worldName
      */
     public void removeGroup(String groupName, String worldName) {
         if (groupName == null || groupName.isEmpty()) {
@@ -213,6 +216,7 @@ public class PermissionUser extends PermissionEntity {
      * Remove user from group
      *
      * @param group group as PermissionGroup object
+     * @param worldName
      */
     public void removeGroup(PermissionGroup group, String worldName) {
         if (group == null) {
@@ -302,6 +306,7 @@ public class PermissionUser extends PermissionEntity {
      * groups
      *
      * @param groupName group's name
+     * @param worldName
      * @return true on success, false otherwise
      */
     public boolean inGroup(String groupName, String worldName) {
@@ -321,6 +326,7 @@ public class PermissionUser extends PermissionEntity {
      *
      * @param promoter null if action is performed from console or by a plugin
      * @param ladderName Ladder name
+     * @return 
      * @throws RankingException
      */
     public PermissionGroup promote(PermissionUser promoter, String ladderName) throws RankingException {
@@ -371,6 +377,7 @@ public class PermissionUser extends PermissionEntity {
      *
      * @param demoter Specify null if action performed from console or by plugin
      * @param ladderName
+     * @return 
      * @throws RankingException
      */
     public PermissionGroup demote(PermissionUser demoter, String ladderName) throws RankingException {
@@ -672,6 +679,7 @@ public class PermissionUser extends PermissionEntity {
     /**
      * Get group names in specified world
      *
+     * @param worldName
      * @return String array of user's group names
      */
     @Deprecated
@@ -683,6 +691,7 @@ public class PermissionUser extends PermissionEntity {
      * Set parent groups for user
      *
      * @param groups array of parent group names
+     * @param worldName
      */
     @Deprecated
     public void setGroups(String[] groups, String worldName) {
@@ -698,6 +707,7 @@ public class PermissionUser extends PermissionEntity {
      * Set parent groups for user
      *
      * @param parentGroups array of parent group objects
+     * @param worldName
      */
     @Deprecated
     public void setGroups(PermissionGroup[] parentGroups, String worldName) {
