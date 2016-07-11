@@ -256,14 +256,14 @@ public class PermissionManager {
      * @return unmodifiable list of users
      */
     public Set<PermissionUser> getUsers() {
-        Set<PermissionUser> users = new HashSet<>();
+        Set<PermissionUser> usersLocal = new HashSet<>();
         for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-            users.add(getUser(p));
+            usersLocal.add(getUser(p));
         }
         for (String name : backend.getUserIdentifiers()) {
-            users.add(getUser(name, null, false));
+            usersLocal.add(getUser(name, null, false));
         }
-        return Collections.unmodifiableSet(users);
+        return Collections.unmodifiableSet(usersLocal);
     }
 
     /**
@@ -284,15 +284,15 @@ public class PermissionManager {
     }
 
     Set<PermissionUser> getActiveUsers(String groupName, boolean inheritance) {
-        Set<PermissionUser> users = new HashSet<>();
+        Set<PermissionUser> usersLocal = new HashSet<>();
 
         for (PermissionUser user : this.getActiveUsers()) {
             if (user.inGroup(groupName, inheritance)) {
-                users.add(user);
+                usersLocal.add(user);
             }
         }
 
-        return Collections.unmodifiableSet(users);
+        return Collections.unmodifiableSet(usersLocal);
     }
 
     Set<PermissionUser> getActiveUsers(String groupName) {
@@ -324,27 +324,27 @@ public class PermissionManager {
      * @return PermissionUser array for groupnName
      */
     public Set<PermissionUser> getUsers(String groupName, String worldName, boolean inheritance) {
-        Set<PermissionUser> users = new HashSet<>();
+        Set<PermissionUser> usersLocal = new HashSet<>();
 
         for (PermissionUser user : this.getUsers()) {
             if (user.inGroup(groupName, worldName, inheritance)) {
-                users.add(user);
+                usersLocal.add(user);
             }
         }
 
-        return Collections.unmodifiableSet(users);
+        return Collections.unmodifiableSet(usersLocal);
     }
 
     public Set<PermissionUser> getUsers(String groupName, boolean inheritance) {
-        Set<PermissionUser> users = new HashSet<>();
+        Set<PermissionUser> usersLocal = new HashSet<>();
 
         for (PermissionUser user : this.getUsers()) {
             if (user.inGroup(groupName, inheritance)) {
-                users.add(user);
+                usersLocal.add(user);
             }
         }
 
-        return Collections.unmodifiableSet(users);
+        return Collections.unmodifiableSet(usersLocal);
     }
 
     /**
@@ -468,30 +468,30 @@ public class PermissionManager {
      * @return unmodifiable PermissionGroup list for specified groupName
      */
     public List<PermissionGroup> getGroups(String groupName, String worldName, boolean inheritance) {
-        List<PermissionGroup> groups = new LinkedList<>();
+        List<PermissionGroup> groupsLocal = new LinkedList<>();
 
         for (PermissionGroup group : this.getGroupList()) {
-            if (!groups.contains(group) && group.isChildOf(groupName, worldName, inheritance)) {
-                groups.add(group);
+            if (!groupsLocal.contains(group) && group.isChildOf(groupName, worldName, inheritance)) {
+                groupsLocal.add(group);
             }
         }
 
-        return Collections.unmodifiableList(groups);
+        return Collections.unmodifiableList(groupsLocal);
     }
 
     public List<PermissionGroup> getGroups(String groupName, boolean inheritance) {
-        List<PermissionGroup> groups = new ArrayList<>();
+        List<PermissionGroup> groupsLocal = new ArrayList<>();
 
         for (World world : Bukkit.getServer().getWorlds()) {
-            groups.addAll(getGroups(groupName, world.getName(), inheritance));
+            groupsLocal.addAll(getGroups(groupName, world.getName(), inheritance));
         }
 
         // Common space users
-        groups.addAll(getGroups(groupName, null, inheritance));
+        groupsLocal.addAll(getGroups(groupName, null, inheritance));
 
-        Collections.sort(groups);
+        Collections.sort(groupsLocal);
 
-        return Collections.unmodifiableList(groups);
+        return Collections.unmodifiableList(groupsLocal);
     }
 
     /**
@@ -629,13 +629,13 @@ public class PermissionManager {
      * @throws ru.tehkode.permissions.exceptions.PermissionBackendException
      */
     public PermissionBackend createBackend(String backendName) throws PermissionBackendException {
-        ConfigurationSection config = this.config.getBackendConfig(backendName);
-        String backendType = config.getString("type");
+        ConfigurationSection configLocal = this.config.getBackendConfig(backendName);
+        String backendType = configLocal.getString("type");
         if (backendType == null) {
-            config.set("type", backendType = backendName);
+            configLocal.set("type", backendType = backendName);
         }
 
-        return PermissionBackend.getBackend(backendType, this, config);
+        return PermissionBackend.getBackend(backendType, this, configLocal);
     }
 
     /**

@@ -23,7 +23,6 @@ import com.mojang.api.profiles.HttpProfileRepository;
 import com.mojang.api.profiles.Profile;
 import com.mojang.api.profiles.ProfileRepository;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -257,10 +256,10 @@ public class UtilityCommands extends PermissionsCommand {
             permission = "permissions.debug",
             description = "Enable/disable debug mode")
     public void toggleFeature(PermissionsEx plugin, CommandSender sender, Map<String, String> args) {
-        PermissionManager manager = plugin.getPermissionsManager();
+        PermissionManager managerLocal = plugin.getPermissionsManager();
 
-        manager.setDebug(!manager.isDebug());
-        String debugStatusMessage = "Debug mode " + (manager.isDebug() ? "enabled" : "disabled");
+        managerLocal.setDebug(!managerLocal.isDebug());
+        String debugStatusMessage = "Debug mode " + (managerLocal.isDebug() ? "enabled" : "disabled");
         if (sender instanceof Player) {
             sender.sendMessage(debugStatusMessage);
         }

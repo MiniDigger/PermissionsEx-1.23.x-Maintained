@@ -82,6 +82,7 @@ public class PermissiblePEX extends PermissibleBase {
         this.player = player;
         this.plugin = plugin;
         permissions = new LinkedHashMap<String, PermissionAttachmentInfo>() {
+            private static final long serialVersionUID = 1L;
             /**
              * Customized put() useable ONLY for this permissible. It's pretty
              * weird otherwise. It'd be better as a putIfAbsent, but it needs to

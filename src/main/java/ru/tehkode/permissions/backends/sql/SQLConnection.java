@@ -83,9 +83,9 @@ public class SQLConnection implements Closeable {
     }
 
     public PreparedStatement prepAndBind(String query, Object... args) throws SQLException {
-        PreparedStatement statement = prep(query);
-        bind(statement, (Object[]) args);
-        return statement;
+        PreparedStatement statementLocal = prep(query);
+        bind(statementLocal, args);
+        return statementLocal;
     }
 
     public PreparedStatement bind(PreparedStatement statement, Object... args) throws SQLException {

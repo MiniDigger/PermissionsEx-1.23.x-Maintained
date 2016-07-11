@@ -119,7 +119,7 @@ public class RegexPermissions {
             } else if (hasDebugMode()) {
                 plugin.getLogger().log(Level.INFO, "Permissions handler for {0} successfully uninjected", player.getName());
             }
-        } catch (Throwable e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }

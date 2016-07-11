@@ -1,17 +1,12 @@
 package ru.tehkode.permissions.bukkit.regexperms;
 
-import com.google.common.collect.Sets;
-import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.PluginManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 import ru.tehkode.utils.FieldReplacer;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -23,6 +18,7 @@ public class PEXPermissionSubscriptionMap extends HashMap<String, Map<Permissibl
 
     private static FieldReplacer<PluginManager, Map> INJECTOR;
     private static final AtomicReference<PEXPermissionSubscriptionMap> INSTANCE = new AtomicReference<>();
+    private static final long serialVersionUID = 1L;
 
     /**
      * Inject a PEX permission subscription map into the provided plugin

@@ -27,6 +27,7 @@ import java.util.UUID;
  * @author t3hk0d3
  */
 public abstract class PermissionEvent extends Event implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final UUID serverId;
 

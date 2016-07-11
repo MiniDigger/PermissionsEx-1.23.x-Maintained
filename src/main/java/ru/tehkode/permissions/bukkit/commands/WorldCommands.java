@@ -40,11 +40,11 @@ public class WorldCommands extends PermissionsCommand {
     public void worldsTree(PermissionsEx plugin, CommandSender sender, Map<String, String> args) {
         List<World> worlds = plugin.getServer().getWorlds();
 
-        PermissionManager manager = plugin.getPermissionsManager();
+        PermissionManager managerLocal = plugin.getPermissionsManager();
 
         sender.sendMessage("Worlds on server: ");
         for (World world : worlds) {
-            List<String> parentWorlds = manager.getWorldInheritance(world.getName());
+            List<String> parentWorlds = managerLocal.getWorldInheritance(world.getName());
             String output = "  " + world.getName();
             if (!parentWorlds.isEmpty()) {
                 output += ChatColor.GREEN + " [" + ChatColor.WHITE + StringUtils.implode(parentWorlds, ", ") + ChatColor.GREEN + "]";
@@ -60,13 +60,13 @@ public class WorldCommands extends PermissionsCommand {
             permission = "permissions.manage.worlds")
     public void worldPrintInheritance(PermissionsEx plugin, CommandSender sender, Map<String, String> args) {
         String worldName = this.autoCompleteWorldName(args.get("world"));
-        PermissionManager manager = plugin.getPermissionsManager();
+        PermissionManager managerLocal = plugin.getPermissionsManager();
         if (plugin.getServer().getWorld(worldName) == null) {
             sender.sendMessage("Specified world \"" + args.get("world") + "\" not found.");
             return;
         }
 
-        List<String> parentWorlds = manager.getWorldInheritance(worldName);
+        List<String> parentWorlds = managerLocal.getWorldInheritance(worldName);
 
         if (parentWorlds.isEmpty()) {
             sender.sendMessage("World \"" + worldName + "\" inherits nothing.");
@@ -76,7 +76,7 @@ public class WorldCommands extends PermissionsCommand {
         sender.sendMessage("World \"" + worldName + "\" inherits:");
 
         for (String parentWorld : parentWorlds) {
-            List<String> parents = manager.getWorldInheritance(parentWorld);
+            List<String> parents = managerLocal.getWorldInheritance(parentWorld);
             String output = "  " + parentWorld;
             if (!parents.isEmpty()) {
                 output += ChatColor.GREEN + " [" + ChatColor.WHITE + StringUtils.implode(parents, ", ") + ChatColor.GREEN + "]";
@@ -92,7 +92,7 @@ public class WorldCommands extends PermissionsCommand {
             permission = "permissions.manage.worlds.inheritance")
     public void worldSetInheritance(PermissionsEx plugin, CommandSender sender, Map<String, String> args) {
         String worldName = this.autoCompleteWorldName(args.get("world"));
-        PermissionManager manager = plugin.getPermissionsManager();
+        PermissionManager managerLocal = plugin.getPermissionsManager();
         if (plugin.getServer().getWorld(worldName) == null) {
             sender.sendMessage("Specified world \"" + args.get("world") + "\" not found.");
             return;
@@ -111,7 +111,7 @@ public class WorldCommands extends PermissionsCommand {
             parents.add(parentWorlds.trim());
         }
 
-        manager.setWorldInheritance(worldName, parents);
+        managerLocal.setWorldInheritance(worldName, parents);
 
         sender.sendMessage("World \"" + worldName + "\" inherits " + StringUtils.implode(parents, ", "));
     }

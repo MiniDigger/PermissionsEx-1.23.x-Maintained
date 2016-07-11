@@ -21,6 +21,7 @@ package ru.tehkode.permissions.exceptions;
 import ru.tehkode.permissions.PermissionUser;
 
 public class RankingException extends Exception {
+    private static final long serialVersionUID = 1L;
 
     protected PermissionUser target = null;
     protected PermissionUser promoter = null;

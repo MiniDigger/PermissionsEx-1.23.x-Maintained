@@ -49,14 +49,14 @@ public class FileData implements PermissionsUserData, PermissionsGroupData {
         if (config.isLowerCased(basePath)) {
             entityName = entityName.toLowerCase();
         }
-        String nodePath = FileBackend.buildPath(basePath, entityName);
+        String nodePathLocal = FileBackend.buildPath(basePath, entityName);
 
-        ConfigurationSection entityNode = this.config.getConfigurationSection(nodePath);
+        ConfigurationSection entityNode = this.config.getConfigurationSection(nodePathLocal);
 
         if (entityNode != null) {
             this.virtual = false;
             if (set) {
-                this.nodePath = nodePath;
+                this.nodePath = nodePathLocal;
                 this.entityName = entityName;
             }
             return entityNode;

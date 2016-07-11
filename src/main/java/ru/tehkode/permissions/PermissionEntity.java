@@ -106,7 +106,7 @@ public abstract class PermissionEntity {
      *
      * @return suffix as string
      */
-    public final String getOwnSuffix() {
+    public String getOwnSuffix() {
         return this.getOwnSuffix(null);
     }
 

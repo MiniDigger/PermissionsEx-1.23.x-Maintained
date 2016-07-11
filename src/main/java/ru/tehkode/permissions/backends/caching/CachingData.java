@@ -125,13 +125,13 @@ public abstract class CachingData implements PermissionsData {
 
     @Override
     public Set<String> getWorlds() {
-        Set<String> worlds = this.worlds;
-        if (worlds == null) {
+        Set<String> worldsLocal = this.worlds;
+        if (worldsLocal == null) {
             synchronized (lock) {
-                this.worlds = worlds = getBackingData().getWorlds();
+                this.worlds = worldsLocal = getBackingData().getWorlds();
             }
         }
-        return worlds;
+        return worldsLocal;
     }
 
     protected void clearWorldsCache() {

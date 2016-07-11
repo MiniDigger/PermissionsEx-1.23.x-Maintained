@@ -533,7 +533,7 @@ public class UserCommands extends PermissionsCommand {
             permission = "",
             description = "Set <group> for <user>")
     public void userSetGroup(PermissionsEx plugin, CommandSender sender, Map<String, String> args) {
-        PermissionManager manager = plugin.getPermissionsManager();
+        PermissionManager managerLocal = plugin.getPermissionsManager();
         String groupName = args.get("group");
 
         List<PermissionGroup> groups;
@@ -543,21 +543,21 @@ public class UserCommands extends PermissionsCommand {
             groups = new ArrayList<>(groupsNames.length);
 
             for (String addName : groupsNames) {
-                if (sender instanceof Player && !manager.has((Player) sender, "permissions.manage.membership." + addName.toLowerCase())) {
+                if (sender instanceof Player && !managerLocal.has((Player) sender, "permissions.manage.membership." + addName.toLowerCase())) {
                     sender.sendMessage(ChatColor.RED + "Don't have enough permission for group " + addName);
                     return;
                 }
 
-                groups.add(manager.getGroup(this.autoCompleteGroupName(addName)));
+                groups.add(managerLocal.getGroup(this.autoCompleteGroupName(addName)));
             }
 
         } else {
             groupName = this.autoCompleteGroupName(groupName);
 
             if (groupName != null) {
-                groups = Collections.singletonList(manager.getGroup(groupName));
+                groups = Collections.singletonList(managerLocal.getGroup(groupName));
 
-                if (sender instanceof Player && !manager.has((Player) sender, "permissions.manage.membership." + groupName.toLowerCase())) {
+                if (sender instanceof Player && !managerLocal.has((Player) sender, "permissions.manage.membership." + groupName.toLowerCase())) {
                     sender.sendMessage(ChatColor.RED + "Don't have enough permission for group " + groupName);
                     return;
                 }
@@ -571,7 +571,7 @@ public class UserCommands extends PermissionsCommand {
         String userName = this.autoCompletePlayerName(args.get("user"));
         String worldName = this.autoCompleteWorldName(args.get("world"));
 
-        PermissionUser user = manager.getUser(userName);
+        PermissionUser user = managerLocal.getUser(userName);
 
         if (user == null) {
             sender.sendMessage(ChatColor.RED + "User \"" + userName + "\" doesn't exist.");

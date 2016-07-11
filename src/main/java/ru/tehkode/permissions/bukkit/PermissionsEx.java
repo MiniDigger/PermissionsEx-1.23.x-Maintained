@@ -259,9 +259,9 @@ public class PermissionsEx extends JavaPlugin implements NativeInterface {
             if (getConfiguration().useNetEvents()) {
                 Plugin netEventsPlugin = getServer().getPluginManager().getPlugin("NetEvents");
                 if (netEventsPlugin != null && netEventsPlugin.isEnabled()) {
-                    NetEventsPlugin netEvents = (NetEventsPlugin) netEventsPlugin;
-                    getServer().getPluginManager().registerEvents(new RemoteEventListener(netEvents, permissionsManager), this);
-                    this.netEvents = netEvents;
+                    NetEventsPlugin netEventsLocal = (NetEventsPlugin) netEventsPlugin;
+                    getServer().getPluginManager().registerEvents(new RemoteEventListener(netEventsLocal, permissionsManager), this);
+                    this.netEvents = netEventsLocal;
                 }
             }
         } catch (PermissionBackendException e) {

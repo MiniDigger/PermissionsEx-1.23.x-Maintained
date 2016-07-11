@@ -247,12 +247,12 @@ public class SQLBackend extends PermissionBackend {
     }
 
     public String getTableName(String identifier) {
-        Map<String, Object> tableNames = this.tableNames;
-        if (tableNames == null) {
+        Map<String, Object> tableNamesLocal = this.tableNames;
+        if (tableNamesLocal == null) {
             return identifier;
         }
 
-        Object ret = tableNames.get(identifier);
+        Object ret = tableNamesLocal.get(identifier);
         if (ret == null) {
             return identifier;
         }
