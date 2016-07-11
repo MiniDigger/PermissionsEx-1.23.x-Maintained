@@ -239,8 +239,8 @@ public class PermissionsEx extends JavaPlugin implements NativeInterface {
                             // Versions aren't equal but major version is, this is a minor update
                             return true;
                         } else {
-                            getLogger().warning("An update to " + getDescription().getName() + " version " + remoteVerString + " is available to download from"
-                                    + " http://dev.bukkit.org/bukkit-plugins/permissionsex/. Please review the changes and update as soon as possible!");
+                            getLogger().log(Level.WARNING,"An update to {0} version {1}" + " is available to download from"
+                                    + " http://dev.bukkit.org/bukkit-plugins/permissionsex/. Please review the changes and update as soon as possible!", new Object[]{getDescription().getName(), remoteVerString});
                             return false;
                         }
 
@@ -251,7 +251,7 @@ public class PermissionsEx extends JavaPlugin implements NativeInterface {
                     public void run() {
                         switch (updater.getResult()) {
                             case SUCCESS:
-                                getLogger().info("An update to " + updater.getLatestName() + " was downloaded and will be applied on next server launch.");
+                                getLogger().log(Level.INFO, "An update to {0} was downloaded and will be applied on next server launch.", updater.getLatestName());
                         }
                     }
                 });

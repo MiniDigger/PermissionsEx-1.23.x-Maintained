@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -94,9 +95,7 @@ public class CommandsManager {
         // Check permission
         if (sender instanceof Player) { // this method are not public and required permission
             if (!selectedBinding.checkPermissions((Player) sender)) {
-                plugin.getLogger().warning("User " + sender.getName() + " tried to access chat command \""
-                        + command.getName() + " " + arguments
-                        + "\", but doesn't have permission to do this.");
+                plugin.getLogger().log(Level.WARNING, "User {0} tried to access chat command \"{1} {2}\", but doesn''t have permission to do this.", new Object[]{sender.getName(), command.getName(), arguments});
                 sender.sendMessage(ChatColor.RED + "Sorry, you don't have enough permissions.");
                 return true;
             }
@@ -113,7 +112,7 @@ public class CommandsManager {
                 throw new RuntimeException(e.getCause());
             }
         } catch (Exception e) {
-            plugin.getLogger().severe("There is bogus command handler for " + command.getName() + " command. (Is appropriate plugin is update?)");
+            plugin.getLogger().log(Level.SEVERE, "There is bogus command handler for {0} command. (Is appropriate plugin is update?)", command.getName());
             if (e.getCause() != null) {
                 e.getCause().printStackTrace();
             } else {

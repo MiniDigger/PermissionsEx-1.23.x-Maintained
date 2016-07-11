@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import org.bukkit.configuration.InvalidConfigurationException;
 
 /**
@@ -380,7 +381,7 @@ public class FileBackend extends PermissionBackend {
         try {
             this.permissions.save();
         } catch (IOException e) {
-            getManager().getLogger().severe("Error while saving permissions file: " + e.getMessage());
+            getManager().getLogger().log(Level.SEVERE, "Error while saving permissions file: {0}", e.getMessage());
         }
     }
 

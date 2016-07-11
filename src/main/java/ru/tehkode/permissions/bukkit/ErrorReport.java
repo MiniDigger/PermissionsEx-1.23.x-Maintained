@@ -183,9 +183,9 @@ public class ErrorReport {
                 pluginList.append("- ");
                 if (plugin.getDescription() != null) {
                     if (plugin.isEnabled()) {
-                        pluginList.append(plugin.getDescription().getName() + " *v" + plugin.getDescription().getVersion() + "*");
+                        pluginList.append(plugin.getDescription().getName()).append(" *v").append(plugin.getDescription().getVersion()).append("*");
                     } else {
-                        pluginList.append("~~").append(plugin.getDescription().getName() + " *v" + plugin.getDescription().getVersion() + "*").append("~~");
+                        pluginList.append("~~").append(plugin.getDescription().getName()).append(" *v").append(plugin.getDescription().getVersion()).append("*").append("~~");
                     }
                 } else {
                     pluginList.append("Unknown Plugin!");
