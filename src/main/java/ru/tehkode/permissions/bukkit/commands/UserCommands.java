@@ -30,6 +30,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import ru.tehkode.permissions.PermissionEntity;
 import ru.tehkode.permissions.PermissionGroup;
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.PermissionUser;
@@ -614,7 +615,7 @@ public class UserCommands extends PermissionsCommand {
             permission = "permissions.manage.users.cleanup",
             description = "Clean users of specified group, which last login was before threshold (in days). By default threshold is 30 days.")
     public void usersCleanup(PermissionsEx plugin, CommandSender sender, Map<String, String> args) {
-        long threshold = 2304000;
+        long threshold = 2592000; // 2592000 - 30 days in seconds
 
         PermissionGroup group = plugin.getPermissionsManager().getGroup(args.get("group"));
 
@@ -627,17 +628,12 @@ public class UserCommands extends PermissionsCommand {
             }
         }
 
-        int removed = 0;
-
         Long deadline = (System.currentTimeMillis() / 1000L) - threshold;
-        for (PermissionUser user : group.getUsers()) { // TODO: figure out whats wrong here can not convert to Functional Operation
+        // TODO Needs testing!
+        long removed = group.getUsers().stream().filter(user -> {
             int lastLogin = user.getOwnOptionInteger("last-login-time", null, 0);
-
-            if (lastLogin > 0 && lastLogin < deadline) {
-                user.remove();
-                removed++;
-            }
-        }
+            return lastLogin > 0 && lastLogin < deadline;
+        }).peek(PermissionEntity::remove).count();
 
         sender.sendMessage("Cleaned " + removed + " users");
     }
