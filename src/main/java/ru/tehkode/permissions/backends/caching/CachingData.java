@@ -28,12 +28,9 @@ public abstract class CachingData implements PermissionsData {
     }
 
     protected void execute(final Runnable run) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (lock) {
-                    run.run();
-                }
+        executor.execute(() -> {
+            synchronized (lock) {
+                run.run();
             }
         });
     }
@@ -49,9 +46,9 @@ public abstract class CachingData implements PermissionsData {
     protected void loadOptions() {
         synchronized (lock) {
             this.options = new HashMap<>();
-            for (Map.Entry<String, Map<String, String>> e : getBackingData().getOptionsMap().entrySet()) {
+            getBackingData().getOptionsMap().entrySet().stream().forEach((e) -> {
                 this.options.put(e.getKey(), new HashMap<>(e.getValue()));
-            }
+            });
         }
     }
 
@@ -100,12 +97,9 @@ public abstract class CachingData implements PermissionsData {
             loadPermissions();
         }
         final List<String> safePermissions = new ArrayList<>(permissions);
-        execute(new Runnable() {
-            @Override
-            public void run() {
-                clearWorldsCache();
-                getBackingData().setPermissions(safePermissions, worldName);
-            }
+        execute(() -> {
+            clearWorldsCache();
+            getBackingData().setPermissions(safePermissions, worldName);
         });
         this.permissions.put(worldName, safePermissions);
     }
@@ -117,9 +111,9 @@ public abstract class CachingData implements PermissionsData {
         }
 
         Map<String, List<String>> ret = new HashMap<>();
-        for (Map.Entry<String, List<String>> e : permissions.entrySet()) {
+        permissions.entrySet().stream().forEach((e) -> {
             ret.put(e.getKey(), Collections.unmodifiableList(e.getValue()));
-        }
+        });
         return Collections.unmodifiableMap(ret);
     }
 
@@ -155,11 +149,8 @@ public abstract class CachingData implements PermissionsData {
         if (options == null) {
             loadOptions();
         }
-        execute(new Runnable() {
-            @Override
-            public void run() {
-                getBackingData().setOption(option, value, world);
-            }
+        execute(() -> {
+            getBackingData().setOption(option, value, world);
         });
         if (options != null) {
             Map<String, String> optionsMap = options.get(world);
@@ -192,9 +183,9 @@ public abstract class CachingData implements PermissionsData {
             loadOptions();
         }
         Map<String, Map<String, String>> ret = new HashMap<>();
-        for (Map.Entry<String, Map<String, String>> e : options.entrySet()) {
+        options.entrySet().stream().forEach((e) -> {
             ret.put(e.getKey(), Collections.unmodifiableMap(e.getValue()));
-        }
+        });
         return Collections.unmodifiableMap(ret);
     }
 
@@ -214,11 +205,8 @@ public abstract class CachingData implements PermissionsData {
             loadInheritance();
         }
         final List<String> safeParents = new ArrayList<>(rawParents);
-        execute(new Runnable() {
-            @Override
-            public void run() {
-                getBackingData().setParents(safeParents, worldName);
-            }
+        execute(() -> {
+            getBackingData().setParents(safeParents, worldName);
         });
         this.parents.put(worldName, Collections.unmodifiableList(safeParents));
     }
@@ -230,11 +218,8 @@ public abstract class CachingData implements PermissionsData {
 
     @Override
     public void save() {
-        execute(new Runnable() {
-            @Override
-            public void run() {
-                getBackingData().save();
-            }
+        execute(() -> {
+            getBackingData().save();
         });
     }
 
@@ -252,9 +237,9 @@ public abstract class CachingData implements PermissionsData {
             loadInheritance();
         }
         Map<String, List<String>> ret = new HashMap<>();
-        for (Map.Entry<String, List<String>> e : parents.entrySet()) {
+        parents.entrySet().stream().forEach((e) -> {
             ret.put(e.getKey(), Collections.unmodifiableList(e.getValue()));
-        }
+        });
         return Collections.unmodifiableMap(ret);
     }
 }

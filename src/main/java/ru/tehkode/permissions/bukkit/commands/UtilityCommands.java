@@ -111,14 +111,14 @@ public class UtilityCommands extends PermissionsCommand {
         Object node = config.get(nodeName);
         if (node instanceof Map) {
             sender.sendMessage("Node \"" + nodeName + "\": ");
-            for (Map.Entry<?, ?> entry : ((Map<?, ?>) node).entrySet()) {
+            ((Map<?, ?>) node).entrySet().stream().forEach((entry) -> {
                 sender.sendMessage("  " + entry.getKey() + " = " + entry.getValue());
-            }
+            });
         } else if (node instanceof List) {
             sender.sendMessage("Node \"" + nodeName + "\": ");
-            for (Object item : ((List<?>) node)) {
+            ((List<?>) node).stream().forEach((item) -> {
                 sender.sendMessage(" - " + item);
-            }
+            });
         } else {
             sender.sendMessage("Node \"" + nodeName + "\" = \"" + node + "\"");
         }

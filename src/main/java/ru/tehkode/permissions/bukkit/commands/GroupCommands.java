@@ -44,14 +44,14 @@ public class GroupCommands extends PermissionsCommand {
         String worldName = this.autoCompleteWorldName(args.get("world"));
 
         sender.sendMessage(ChatColor.WHITE + "Registered groups: ");
-        for (PermissionGroup group : groups) {
+        groups.stream().forEach((group) -> {
             String rank = "";
             if (group.isRanked()) {
                 rank = " (rank: " + group.getRank() + "@" + group.getRankLadder() + ") ";
             }
 
             sender.sendMessage(String.format("  %s %s %s %s[%s]", group.getIdentifier(), " #" + group.getWeight(), rank, ChatColor.DARK_GREEN, StringUtils.implode(group.getParentIdentifiers(worldName), ", ")));
-        }
+        });
     }
 
     @Command(name = "pex",
@@ -250,9 +250,9 @@ public class GroupCommands extends PermissionsCommand {
 
         sender.sendMessage("Group " + group.getIdentifier() + " parents:");
 
-        for (String parent : parentNames) {
+        parentNames.stream().forEach((parent) -> {
             sender.sendMessage("  " + parent);
-        }
+        });
 
     }
 
@@ -392,22 +392,20 @@ public class GroupCommands extends PermissionsCommand {
         printEntityInheritance(sender, group.getParents());
 
         Map<String, List<PermissionGroup>> parents = group.getAllParents();
-        for (String world : parents.keySet()) {
-            if (world == null) {
-                continue;
-            }
-
+        parents.keySet().stream().filter((world) -> !(world == null)).map((world) -> {
             sender.sendMessage("  @" + world + ":");
+            return world;
+        }).forEach((world) -> {
             printEntityInheritance(sender, parents.get(world));
-        }
+        });
 
         sender.sendMessage("Group \"" + group.getIdentifier() + "\"'s permissions:");
         this.sendMessage(sender, this.mapPermissions(worldName, group, 0));
 
         sender.sendMessage("Group \"" + group.getIdentifier() + "\"'s Options: ");
-        for (Map.Entry<String, String> option : group.getOptions(worldName).entrySet()) {
+        group.getOptions(worldName).entrySet().stream().forEach((option) -> {
             sender.sendMessage("  " + option.getKey() + " = \"" + option.getValue() + "\"");
-        }
+        });
     }
 
     @Command(name = "pex",
@@ -594,9 +592,9 @@ public class GroupCommands extends PermissionsCommand {
 
         sender.sendMessage("Group \"" + groupName + "\"'s users (" + users.size() + "):");
 
-        for (PermissionUser user : users) {
+        users.stream().forEach((user) -> {
             sender.sendMessage("   " + describeUser(user));
-        }
+        });
     }
 
     @Command(name = "pex",
@@ -673,9 +671,9 @@ public class GroupCommands extends PermissionsCommand {
 
         List<PermissionGroup> defaultGroups = plugin.getPermissionsManager().getDefaultGroups(worldName);
         sender.sendMessage("Default groups in world \"" + worldName + "\" are:");
-        for (PermissionGroup grp : defaultGroups) {
+        defaultGroups.stream().forEach((grp) -> {
             sender.sendMessage("  - " + grp.getIdentifier());
-        }
+        });
     }
 
     @Command(name = "pex",

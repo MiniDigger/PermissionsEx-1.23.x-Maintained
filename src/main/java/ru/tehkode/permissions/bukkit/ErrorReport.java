@@ -141,15 +141,12 @@ public class ErrorReport {
 
     public static void handleError(final String cause, final Throwable error, final CommandSender target) {
         if (!ASYNC_EXEC.isShutdown()) {
-            ASYNC_EXEC.submit(new Runnable() {
-                @Override
-                public void run() {
-                    String msg = withException(cause, error).buildUserErrorMessage();
-                    if (target != null) {
-                        target.sendMessage(msg);
-                    } else {
-                        PermissionsEx.getPlugin().getLogger().severe(msg);
-                    }
+            ASYNC_EXEC.submit(() -> {
+                String msg = withException(cause, error).buildUserErrorMessage();
+                if (target != null) {
+                    target.sendMessage(msg);
+                } else {
+                    PermissionsEx.getPlugin().getLogger().severe(msg);
                 }
             });
         } else {

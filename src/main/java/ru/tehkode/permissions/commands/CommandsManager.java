@@ -126,9 +126,9 @@ public class CommandsManager {
     public List<CommandBinding> getCommands() {
         List<CommandBinding> commands = new LinkedList<>();
 
-        for (Map<CommandSyntax, CommandBinding> map : this.listeners.values()) {
+        this.listeners.values().stream().forEach((map) -> {
             commands.addAll(map.values());
-        }
+        });
 
         return commands;
     }

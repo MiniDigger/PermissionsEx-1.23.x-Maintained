@@ -208,19 +208,13 @@ public abstract class PermissionBackend {
         this.manager = manager;
         this.backendConfig = backendConfig;
         this.asyncExecutor = Executors.newSingleThreadExecutor();
-        this.onThreadExecutor = new Executor() {
-            @Override
-            public void execute(Runnable runnable) {
-                runnable.run();
-            }
+        this.onThreadExecutor = (Runnable runnable) -> {
+            runnable.run();
         };
         this.activeExecutor = asyncExecutor; // Default
 
-        this.activeExecutorPtr = new Executor() {
-            @Override
-            public void execute(Runnable runnable) {
-                PermissionBackend.this.activeExecutor.execute(runnable);
-            }
+        this.activeExecutorPtr = (Runnable runnable) -> {
+            PermissionBackend.this.activeExecutor.execute(runnable);
         };
     }
 
@@ -373,17 +367,17 @@ public abstract class PermissionBackend {
     public void loadFrom(PermissionBackend backend) {
         setPersistent(false);
         try {
-            for (String group : backend.getGroupNames()) {
+            backend.getGroupNames().stream().forEach((group) -> {
                 BackendDataTransfer.transferGroup(backend.getGroupData(group), getGroupData(group));
-            }
+            });
 
-            for (String user : backend.getUserIdentifiers()) {
+            backend.getUserIdentifiers().stream().forEach((user) -> {
                 BackendDataTransfer.transferUser(backend.getUserData(user), getUserData(user));
-            }
+            });
 
-            for (Map.Entry<String, List<String>> ent : backend.getAllWorldInheritance().entrySet()) {
+            backend.getAllWorldInheritance().entrySet().stream().forEach((ent) -> {
                 setWorldInheritance(ent.getKey(), ent.getValue()); // Could merge data but too complicated & too lazy
-            }
+            });
         } finally {
             setPersistent(true);
         }
@@ -392,14 +386,13 @@ public abstract class PermissionBackend {
     public void revertUUID() {
         this.setPersistent(false);
         try {
-            for (String ident : getUserIdentifiers()) {
-                PermissionsUserData data = getUserData(ident);
+            getUserIdentifiers().stream().map((ident) -> getUserData(ident)).forEach((data) -> {
                 String name = data.getOption("name", null);
                 if (name != null) {
                     data.setIdentifier(name);
                     data.setOption("name", null, null);
                 }
-            }
+            });
         } finally {
             this.setPersistent(true);
         }

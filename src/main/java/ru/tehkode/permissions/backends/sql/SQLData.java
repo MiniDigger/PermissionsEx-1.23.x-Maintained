@@ -181,9 +181,9 @@ public class SQLData implements PermissionsUserData, PermissionsGroupData {
         }
 
         Map<String, List<String>> ret = new HashMap<>();
-        for (Map.Entry<String, List<String>> e : allPermissions.entrySet()) {
+        allPermissions.entrySet().stream().forEach((e) -> {
             ret.put(e.getKey(), Collections.unmodifiableList(e.getValue()));
-        }
+        });
         return Collections.unmodifiableMap(ret);
     }
 

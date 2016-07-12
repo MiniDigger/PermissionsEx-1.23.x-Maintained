@@ -91,9 +91,9 @@ public class RegexPermissions {
     }
 
     private void injectAllPermissibles() {
-        for (Player player : plugin.getServer().getOnlinePlayers()) {
+        plugin.getServer().getOnlinePlayers().stream().forEach((player) -> {
             injectPermissible(player);
-        }
+        });
     }
 
     private void uninjectPermissible(Player player) {
@@ -125,9 +125,9 @@ public class RegexPermissions {
     }
 
     private void uninjectAllPermissibles() {
-        for (Player player : plugin.getServer().getOnlinePlayers()) {
+        plugin.getServer().getOnlinePlayers().stream().forEach((player) -> {
             uninjectPermissible(player);
-        }
+        });
     }
 
     private class EventListener implements Listener {

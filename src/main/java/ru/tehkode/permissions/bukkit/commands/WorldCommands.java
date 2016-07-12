@@ -43,15 +43,16 @@ public class WorldCommands extends PermissionsCommand {
         PermissionManager managerLocal = plugin.getPermissionsManager();
 
         sender.sendMessage("Worlds on server: ");
-        for (World world : worlds) {
+        worlds.stream().map((world) -> {
             List<String> parentWorlds = managerLocal.getWorldInheritance(world.getName());
             String output = "  " + world.getName();
             if (!parentWorlds.isEmpty()) {
                 output += ChatColor.GREEN + " [" + ChatColor.WHITE + StringUtils.implode(parentWorlds, ", ") + ChatColor.GREEN + "]";
             }
-
+            return output;
+        }).forEach((output) -> {
             sender.sendMessage(output);
-        }
+        });
     }
 
     @Command(name = "pex",
@@ -75,15 +76,16 @@ public class WorldCommands extends PermissionsCommand {
 
         sender.sendMessage("World \"" + worldName + "\" inherits:");
 
-        for (String parentWorld : parentWorlds) {
+        parentWorlds.stream().map((parentWorld) -> {
             List<String> parents = managerLocal.getWorldInheritance(parentWorld);
             String output = "  " + parentWorld;
             if (!parents.isEmpty()) {
                 output += ChatColor.GREEN + " [" + ChatColor.WHITE + StringUtils.implode(parents, ", ") + ChatColor.GREEN + "]";
             }
-
+            return output;
+        }).forEach((output) -> {
             sender.sendMessage(output);
-        }
+        });
     }
 
     @Command(name = "pex",

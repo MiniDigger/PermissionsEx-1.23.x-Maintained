@@ -244,7 +244,7 @@ public abstract class PermissionEntity {
      */
     public Map<String, List<String>> getAllPermissions() {
         Map<String, List<String>> ret = new HashMap<>(getData().getPermissionsMap());
-        for (Map.Entry<String, List<String>> timedEnt : timedPermissions.entrySet()) {
+        timedPermissions.entrySet().stream().forEach((timedEnt) -> {
             String worldKey = timedEnt.getKey().isEmpty() ? null : timedEnt.getKey();
             List<String> addTo = new LinkedList<>();
             addTo.addAll(timedEnt.getValue());
@@ -253,7 +253,7 @@ public abstract class PermissionEntity {
                 addTo.addAll(permanentPerms);
             }
             ret.put(worldKey, Collections.unmodifiableList(addTo));
-        }
+        });
         return Collections.unmodifiableMap(ret);
     }
 
@@ -264,23 +264,19 @@ public abstract class PermissionEntity {
         traverse = new HierarchyTraverser<Void>(this, worldName) {
             @Override
             protected Void fetchLocal(PermissionEntity entity, String world) {
-                for (String perm : entity.getOwnPermissions(world)) {
-                    if (perm.startsWith(NON_INHERITABLE_PREFIX) && !PermissionEntity.this.getParents(world).contains(entity)) {
-                        continue;
-                    }
-
+                entity.getOwnPermissions(world).stream().filter((perm) -> !(perm.startsWith(NON_INHERITABLE_PREFIX) && !PermissionEntity.this.getParents(world).contains(entity))).map((perm) -> {
                     ret.add(perm);
+                    return perm;
+                }).forEach((perm) -> {
                     entity.getInheritedChildPermissions(perm, ret);
-                }
+                });
 
-                for (String perm : entity.getTimedPermissions(world)) {
-                    if (perm.startsWith(NON_INHERITABLE_PREFIX) && !PermissionEntity.this.getParents(world).contains(entity)) {
-                        continue;
-                    }
-
+                entity.getTimedPermissions(world).stream().filter((perm) -> !(perm.startsWith(NON_INHERITABLE_PREFIX) && !PermissionEntity.this.getParents(world).contains(entity))).map((perm) -> {
                     ret.add(perm);
+                    return perm;
+                }).forEach((perm) -> {
                     entity.getInheritedChildPermissions(perm, ret);
-                }
+                });
                 return null;
             }
         }.traverse();
@@ -305,14 +301,14 @@ public abstract class PermissionEntity {
         if (perm == null) {
             return;
         }
-        for (Map.Entry<String, Boolean> entry : perm.getChildren().entrySet()) {
+        perm.getChildren().entrySet().stream().forEach((entry) -> {
             boolean has = entry.getValue() ^ invert;
             String node = (has ? "" : "-") + entry.getKey();
             if (!list.contains(node)) {
                 list.add(node);
                 getInheritedChildPermissions(node, list, !has);
             }
-        }
+        });
     }
 
     /**
@@ -362,9 +358,9 @@ public abstract class PermissionEntity {
      * @param permission Permission to remove
      */
     public void removePermission(String permission) {
-        for (String world : this.getAllPermissions().keySet()) {
+        this.getAllPermissions().keySet().stream().forEach((world) -> {
             this.removePermission(permission, world);
-        }
+        });
     }
 
     /**
@@ -687,7 +683,7 @@ public abstract class PermissionEntity {
         }
 
         if (!this.timedPermissions.containsKey(world)) {
-            this.timedPermissions.put(world, new LinkedList<String>());
+            this.timedPermissions.put(world, new LinkedList<>());
         }
 
         this.timedPermissions.get(world).add(permission);
@@ -818,9 +814,9 @@ public abstract class PermissionEntity {
     // -- Inheritance -- //
     public List<PermissionGroup> getOwnParents(String world) {
         List<PermissionGroup> ret = new ArrayList<>();
-        for (String group : getOwnParentIdentifiers(world)) {
+        getOwnParentIdentifiers(world).stream().forEach((group) -> {
             ret.add(manager.getGroup(group));
-        }
+        });
         Collections.sort(ret);
         return Collections.unmodifiableList(ret);
     }
@@ -850,17 +846,10 @@ public abstract class PermissionEntity {
         new HierarchyTraverser<Void>(this, world, false) { // Must not traverse inheritance or bad things happen :)
             @Override
             protected Void fetchLocal(PermissionEntity entity, String world) {
-                for (String groupName : entity.getOwnParentIdentifiers(world)) {
-                    if (groupName == null || groupName.trim().isEmpty()
-                            || (PermissionEntity.this instanceof PermissionGroup && groupName.equalsIgnoreCase(getIdentifier()))) {
-                        continue;
-                    }
-
-                    PermissionGroup group = manager.getGroup(groupName);
-                    if (!ret.contains(group)) {
-                        ret.add(group);
-                    }
-                }
+                entity.getOwnParentIdentifiers(world).stream().filter((groupName) -> !(groupName == null || groupName.trim().isEmpty()
+                        || (PermissionEntity.this instanceof PermissionGroup && groupName.equalsIgnoreCase(getIdentifier())))).map((groupName) -> manager.getGroup(groupName)).filter((group) -> (!ret.contains(group))).forEach((group) -> {
+                            ret.add(group);
+                        });
                 return null;
             }
         }.traverse();
@@ -870,9 +859,9 @@ public abstract class PermissionEntity {
 
     public List<String> getParentIdentifiers(String world) {
         List<String> ret = new LinkedList<>();
-        for (PermissionGroup group : getParentsInternal(world)) {
+        getParentsInternal(world).stream().forEach((group) -> {
             ret.add(group.getIdentifier());
-        }
+        });
 
         return Collections.unmodifiableList(ret);
     }
@@ -889,9 +878,9 @@ public abstract class PermissionEntity {
     public Map<String, List<PermissionGroup>> getAllParents() {
         Map<String, List<PermissionGroup>> allGroups = new HashMap<>();
 
-        for (String worldName : this.getWorlds()) {
+        this.getWorlds().stream().forEach((worldName) -> {
             allGroups.put(worldName, this.getWorldParents(worldName));
-        }
+        });
         allGroups.put(null, this.getWorldParents(null));
 
         return Collections.unmodifiableMap(allGroups);
@@ -899,16 +888,9 @@ public abstract class PermissionEntity {
 
     protected List<PermissionGroup> getWorldParents(String worldName) {
         List<PermissionGroup> groups = new LinkedList<>();
-        for (String groupName : getData().getParents(worldName)) {
-            if (groupName == null || groupName.trim().isEmpty() || (this instanceof PermissionGroup && groupName.equalsIgnoreCase(this.getIdentifier()))) {
-                continue;
-            }
-
-            PermissionGroup group = this.manager.getGroup(groupName);
-            if (!groups.contains(group)) {
-                groups.add(group);
-            }
-        }
+        getData().getParents(worldName).stream().filter((groupName) -> !(groupName == null || groupName.trim().isEmpty() || (this instanceof PermissionGroup && groupName.equalsIgnoreCase(this.getIdentifier())))).map((groupName) -> this.manager.getGroup(groupName)).filter((group) -> (!groups.contains(group))).forEach((group) -> {
+            groups.add(group);
+        });
 
         Collections.sort(groups);
         return Collections.unmodifiableList(groups);
@@ -916,9 +898,9 @@ public abstract class PermissionEntity {
 
     public void setParents(List<PermissionGroup> parents, String world) {
         List<String> parentNames = new LinkedList<>();
-        for (PermissionGroup group : parents) {
+        parents.stream().forEach((group) -> {
             parentNames.add(group.getIdentifier());
-        }
+        });
         setParentsIdentifier(parentNames, world);
     }
 

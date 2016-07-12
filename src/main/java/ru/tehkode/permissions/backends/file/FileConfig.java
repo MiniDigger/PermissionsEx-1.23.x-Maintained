@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class FileConfig extends YamlConfiguration {
 
@@ -67,22 +66,19 @@ public class FileConfig extends YamlConfiguration {
     public void loadFromString(String contents) throws InvalidConfigurationException {
         synchronized (lock) {
             super.loadFromString(contents);
-            for (String sectionKey : lowerCaseSections) {
-                ConfigurationSection section = getConfigurationSection(sectionKey);
-                if (section != null) {
-                    for (Map.Entry<String, Object> entry : section.getValues(false).entrySet()) {
-                        final String lowerString = entry.getKey().toLowerCase();
-                        if (!lowerString.equals(entry.getKey())) {
-                            section.set(entry.getKey(), null);
-                            if (entry.getValue() instanceof ConfigurationSection) {
-                                section.createSection(lowerString, ((ConfigurationSection) entry.getValue()).getValues(false));
-                            } else {
-                                section.set(lowerString, entry.getValue());
-                            }
+            lowerCaseSections.stream().map((sectionKey) -> getConfigurationSection(sectionKey)).filter((section) -> (section != null)).forEach((section) -> {
+                section.getValues(false).entrySet().stream().forEach((entry) -> {
+                    final String lowerString = entry.getKey().toLowerCase();
+                    if (!lowerString.equals(entry.getKey())) {
+                        section.set(entry.getKey(), null);
+                        if (entry.getValue() instanceof ConfigurationSection) {
+                            section.createSection(lowerString, ((ConfigurationSection) entry.getValue()).getValues(false));
+                        } else {
+                            section.set(lowerString, entry.getValue());
                         }
                     }
-                }
-            }
+                });
+            });
         }
     }
 

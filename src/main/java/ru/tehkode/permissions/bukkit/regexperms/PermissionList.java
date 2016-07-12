@@ -68,9 +68,9 @@ public class PermissionList extends HashMap<String, Permission> {
     
     @Override
     public Permission put(String k, Permission v) {
-        for (Map.Entry<String, Boolean> ent : v.getChildren().entrySet()) {
+        v.getChildren().entrySet().stream().forEach((ent) -> {
             childParentMapping.put(ent.getKey(), new SimpleEntry<>(v.getName(), ent.getValue()));
-        }
+        });
         FieldReplacer<Permission, Map> repl = getFieldReplacer(v);
         repl.set(v, new NotifyingChildrenMap(v));
         return super.put(k, v);

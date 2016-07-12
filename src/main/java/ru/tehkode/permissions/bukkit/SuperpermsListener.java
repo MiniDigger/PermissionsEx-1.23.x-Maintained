@@ -33,9 +33,9 @@ public class SuperpermsListener implements Listener {
 
     public SuperpermsListener(PermissionsEx plugin) {
         this.plugin = plugin;
-        for (Player player : plugin.getServer().getOnlinePlayers()) {
+        plugin.getServer().getOnlinePlayers().stream().forEach((player) -> {
             updateAttachment(player);
-        }
+        });
     }
 
     protected void updateAttachment(Player player) {
@@ -91,7 +91,7 @@ public class SuperpermsListener implements Listener {
 
     private void updatePlayerPermission(Permission permission, PermissionUser user, String worldName) {
         permission.getChildren().clear();
-        for (String perm : user.getPermissions(worldName)) {
+        user.getPermissions(worldName).stream().forEach((perm) -> {
             boolean value = true;
             if (perm.startsWith("-")) {
                 value = false;
@@ -100,7 +100,7 @@ public class SuperpermsListener implements Listener {
             if (!permission.getChildren().containsKey(perm)) {
                 permission.getChildren().put(perm, value);
             }
-        }
+        });
     }
 
     private void updatePlayerMetadata(Permission rootPermission, PermissionUser user, String worldName) {
@@ -109,15 +109,17 @@ public class SuperpermsListener implements Listener {
         final Map<String, String> options = user.getOptions(worldName);
         // Metadata
         // Groups
-        for (String group : groups) {
+        groups.stream().map((group) -> {
             rootPermission.getChildren().put("groups." + group, true);
+            return group;
+        }).forEach((group) -> {
             rootPermission.getChildren().put("group." + group, true);
-        }
+        });
 
         // Options
-        for (Map.Entry<String, String> option : options.entrySet()) {
+        options.entrySet().stream().forEach((option) -> {
             rootPermission.getChildren().put("options." + option.getKey() + "." + option.getValue(), true);
-        }
+        });
 
         // Prefix and Suffix
         rootPermission.getChildren().put("prefix." + user.getPrefix(worldName), true);
@@ -136,9 +138,9 @@ public class SuperpermsListener implements Listener {
     }
 
     public void onDisable() {
-        for (PermissionAttachment attach : attachments.values()) {
+        attachments.values().stream().forEach((attach) -> {
             attach.remove();
-        }
+        });
         attachments.clear();
     }
 
@@ -238,9 +240,9 @@ public class SuperpermsListener implements Listener {
             if (event.getEntity() instanceof PermissionUser) { // update user only
                 updateSelective(event, (PermissionUser) event.getEntity());
             } else if (event.getEntity() instanceof PermissionGroup) { // update all members of group, might be resource hog
-                for (PermissionUser user : ((PermissionGroup) event.getEntity()).getActiveUsers(true)) {
+                ((PermissionGroup) event.getEntity()).getActiveUsers(true).stream().forEach((user) -> {
                     updateSelective(event, user);
-                }
+                });
             }
         } catch (Throwable t) {
             ErrorReport.handleError("Superperms event permission entity", t);
@@ -267,9 +269,9 @@ public class SuperpermsListener implements Listener {
                 case REINJECT_PERMISSIBLES:
                     return;
                 default:
-                    for (Player p : plugin.getServer().getOnlinePlayers()) {
+                    plugin.getServer().getOnlinePlayers().stream().forEach((p) -> {
                         updateAttachment(p);
-                    }
+            });
             }
         } catch (Throwable t) {
             ErrorReport.handleError("Superperms event permission system event", t);

@@ -33,7 +33,7 @@ public class MultiBackend extends PermissionBackend {
         Map<String, PermissionBackend> backendMap = new HashMap<>();
         List<String> backendNames = backendConfig.getStringList("backends");
         if (backendNames.isEmpty()) {
-            backendConfig.set("backends", new ArrayList<String>());
+            backendConfig.set("backends", new ArrayList<>());
             throw new PermissionBackendException("No backends configured for multi backend! Please configure this!");
         }
         for (String name : backendConfig.getStringList("backends")) {
@@ -103,48 +103,38 @@ public class MultiBackend extends PermissionBackend {
 
     @Override
     public boolean hasUser(String userName) {
-        for (PermissionBackend backend : backends) {
-            if (backend.hasUser(userName)) {
-                return true;
-            }
-        }
-        return false;
+        return backends.stream().anyMatch((backend) -> (backend.hasUser(userName)));
     }
 
     @Override
     public boolean hasGroup(String group) {
-        for (PermissionBackend backend : backends) {
-            if (backend.hasGroup(group)) {
-                return true;
-            }
-        }
-        return false;
+        return backends.stream().anyMatch((backend) -> (backend.hasGroup(group)));
     }
 
     @Override
     public Collection<String> getUserIdentifiers() {
         Set<String> ret = new HashSet<>();
-        for (PermissionBackend backend : backends) {
+        backends.stream().forEach((backend) -> {
             ret.addAll(backend.getUserIdentifiers());
-        }
+        });
         return Collections.unmodifiableSet(ret);
     }
 
     @Override
     public Collection<String> getUserNames() {
         Set<String> ret = new HashSet<>();
-        for (PermissionBackend backend : backends) {
+        backends.stream().forEach((backend) -> {
             ret.addAll(backend.getUserNames());
-        }
+        });
         return Collections.unmodifiableSet(ret);
     }
 
     @Override
     public Collection<String> getGroupNames() {
         Set<String> ret = new HashSet<>();
-        for (PermissionBackend backend : backends) {
+        backends.stream().forEach((backend) -> {
             ret.addAll(backend.getGroupNames());
-        }
+        });
         return Collections.unmodifiableSet(ret);
     }
 

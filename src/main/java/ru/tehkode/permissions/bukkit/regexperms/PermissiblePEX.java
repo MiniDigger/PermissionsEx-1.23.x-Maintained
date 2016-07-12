@@ -182,10 +182,12 @@ public class PermissiblePEX extends PermissibleBase {
                     calculateChildPerms(attach.getPermissions(), false, attach);
                 }
 
-                for (Permission p : player.getServer().getPluginManager().getDefaultPermissions(isOp())) {
+                player.getServer().getPluginManager().getDefaultPermissions(isOp()).stream().map((p) -> {
                     this.permissions.put(p.getName(), new PermissionAttachmentInfo(player, p.getName(), null, true));
+                    return p;
+                }).forEach((p) -> {
                     calculateChildPerms(p.getChildren(), false, null);
-                }
+                });
             }
         }
     }

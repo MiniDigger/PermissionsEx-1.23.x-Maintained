@@ -75,11 +75,9 @@ public class PEXSubscriptionValueMap implements Map<Permissible, Boolean> {
     public Set<Permissible> keySet() {
         Collection<? extends Player> players = outer.plugin.getServer().getOnlinePlayers();
         Set<Permissible> pexMatches = new HashSet<>(players.size());
-        for (Player player : players) {
-            if (player.hasPermission(permission)) {
-                pexMatches.add(player);
-            }
-        }
+        players.stream().filter((player) -> (player.hasPermission(permission))).forEach((player) -> {
+            pexMatches.add(player);
+        });
         return Sets.union(pexMatches, backing.keySet());
     }
 

@@ -99,19 +99,15 @@ public class FileBackend extends PermissionBackend {
             public void performUpdate() {
                 ConfigurationSection userSection = permissions.getConfigurationSection("users");
                 if (userSection != null) {
-                    for (Map.Entry<String, Object> e : userSection.getValues(false).entrySet()) {
-                        if (e.getValue() instanceof ConfigurationSection) {
-                            allWorlds((ConfigurationSection) e.getValue());
-                        }
-                    }
+                    userSection.getValues(false).entrySet().stream().filter((e) -> (e.getValue() instanceof ConfigurationSection)).forEach((e) -> {
+                        allWorlds((ConfigurationSection) e.getValue());
+                    });
                 }
                 ConfigurationSection groupSection = permissions.getConfigurationSection("groups");
                 if (groupSection != null) {
-                    for (Map.Entry<String, Object> e : groupSection.getValues(false).entrySet()) {
-                        if (e.getValue() instanceof ConfigurationSection) {
-                            allWorlds((ConfigurationSection) e.getValue());
-                        }
-                    }
+                    groupSection.getValues(false).entrySet().stream().filter((e) -> (e.getValue() instanceof ConfigurationSection)).forEach((e) -> {
+                        allWorlds((ConfigurationSection) e.getValue());
+                    });
                 }
             }
 
@@ -119,11 +115,9 @@ public class FileBackend extends PermissionBackend {
                 singleWorld(section);
                 ConfigurationSection worldSection = section.getConfigurationSection("worlds");
                 if (worldSection != null) {
-                    for (Map.Entry<String, Object> e : worldSection.getValues(false).entrySet()) {
-                        if (e.getValue() instanceof ConfigurationSection) {
-                            singleWorld((ConfigurationSection) e.getValue());
-                        }
-                    }
+                    worldSection.getValues(false).entrySet().stream().filter((e) -> (e.getValue() instanceof ConfigurationSection)).forEach((e) -> {
+                        singleWorld((ConfigurationSection) e.getValue());
+                    });
                 }
             }
 
@@ -193,9 +187,9 @@ public class FileBackend extends PermissionBackend {
             }
 
             Map<String, List<String>> ret = new HashMap<>();
-            for (String world : worldsSection.getKeys(false)) {
+            worldsSection.getKeys(false).stream().forEach((world) -> {
                 ret.put(world, getWorldInheritance(world));
-            }
+            });
             return Collections.unmodifiableMap(ret);
         }
     }
@@ -208,13 +202,10 @@ public class FileBackend extends PermissionBackend {
         final List<String> parentWorlds = new ArrayList<>(rawParentWorlds);
         worldInheritanceCache.put(world, parentWorlds);
 
-        getExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (lock) {
-                    permissions.set(buildPath("worlds", world, "inheritance"), parentWorlds);
-                    save();
-                }
+        getExecutor().execute(() -> {
+            synchronized (lock) {
+                permissions.set(buildPath("worlds", world, "inheritance"), parentWorlds);
+                save();
             }
         });
     }
@@ -253,10 +244,8 @@ public class FileBackend extends PermissionBackend {
 
             ConfigurationSection userSection = this.permissions.getConfigurationSection("groups");
             if (userSection != null) {
-                for (String name : userSection.getKeys(false)) {
-                    if (group.equalsIgnoreCase(name)) {
-                        return true;
-                    }
+                if (userSection.getKeys(false).stream().anyMatch((name) -> (group.equalsIgnoreCase(name)))) {
+                    return true;
                 }
 
             }
@@ -283,16 +272,9 @@ public class FileBackend extends PermissionBackend {
 
             Set<String> userNames = new HashSet<>();
 
-            for (Map.Entry<String, Object> entry : users.getValues(false).entrySet()) {
-                if (entry.getValue() instanceof ConfigurationSection) {
-                    ConfigurationSection userSection = (ConfigurationSection) entry.getValue();
-
-                    String name = userSection.getString(buildPath("options", "name"));
-                    if (name != null) {
-                        userNames.add(name);
-                    }
-                }
-            }
+            users.getValues(false).entrySet().stream().filter((entry) -> (entry.getValue() instanceof ConfigurationSection)).map((entry) -> (ConfigurationSection) entry.getValue()).map((userSection) -> userSection.getString(buildPath("options", "name"))).filter((name) -> (name != null)).forEach((name) -> {
+                userNames.add(name);
+            });
             return Collections.unmodifiableSet(userNames);
         }
     }

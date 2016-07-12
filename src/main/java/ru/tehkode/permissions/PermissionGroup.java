@@ -137,7 +137,7 @@ public class PermissionGroup extends PermissionEntity implements Comparable<Perm
      * group
      */
     public boolean isChildOf(PermissionGroup group, String worldName, boolean checkInheritance) {
-        return isChildOf(group, worldName, checkInheritance ? new HashSet<String>() : null);
+        return isChildOf(group, worldName, checkInheritance ? new HashSet<>() : null);
     }
 
     private boolean isChildOf(PermissionGroup group, String worldName, Set<String> visitedParents) {
@@ -167,10 +167,8 @@ public class PermissionGroup extends PermissionEntity implements Comparable<Perm
     }
 
     public boolean isChildOf(PermissionGroup group, boolean checkInheritance) {
-        for (String worldName : this.getWorlds()) {
-            if (this.isChildOf(group, worldName, checkInheritance)) {
-                return true;
-            }
+        if (this.getWorlds().stream().anyMatch((worldName) -> (this.isChildOf(group, worldName, checkInheritance)))) {
+            return true;
         }
 
         return this.isChildOf(group, null, checkInheritance);
@@ -276,32 +274,32 @@ public class PermissionGroup extends PermissionEntity implements Comparable<Perm
 
     protected void clearCache() {
         this.dirtyWeight = true;
-        for (PermissionUser user : this.getActiveUsers()) {
+        this.getActiveUsers().stream().forEach((user) -> {
             user.clearCache();
-        }
+        });
     }
 
     @Override
     public void remove() {
-        for (String world : this.getWorlds()) {
+        this.getWorlds().stream().forEach((world) -> {
             this.clearChildren(world);
-        }
+        });
 
         this.clearChildren(null);
         super.remove();
     }
 
     private void clearChildren(String worldName) {
-        for (PermissionGroup group : this.getChildGroups(worldName)) {
+        this.getChildGroups(worldName).stream().forEach((group) -> {
             List<PermissionGroup> parentGroups = new LinkedList<>(group.getOwnParents(worldName));
             parentGroups.remove(this);
 
             group.setParents(parentGroups, worldName);
-        }
+        });
 
-        for (PermissionUser user : this.getUsers(worldName)) {
+        this.getUsers(worldName).stream().forEach((user) -> {
             user.removeGroup(this, worldName);
-        }
+        });
     }
 
     @Override

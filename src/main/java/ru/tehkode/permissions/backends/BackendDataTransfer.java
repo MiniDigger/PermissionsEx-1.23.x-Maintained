@@ -5,7 +5,6 @@ import ru.tehkode.permissions.PermissionsGroupData;
 import ru.tehkode.permissions.PermissionsUserData;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Helper class to hold static methods relating to import/export between
@@ -14,24 +13,23 @@ import java.util.Map;
 public class BackendDataTransfer {
 
     private static void transferBase(PermissionsData from, PermissionsData to) {
-        for (Map.Entry<String, List<String>> entry : from.getPermissionsMap().entrySet()) {
+        from.getPermissionsMap().entrySet().stream().forEach((entry) -> {
             to.setPermissions(entry.getValue(), entry.getKey());
-        }
+        });
 
-        for (Map.Entry<String, Map<String, String>> entry : from.getOptionsMap().entrySet()) {
-            for (Map.Entry<String, String> option : entry.getValue().entrySet()) {
+        from.getOptionsMap().entrySet().stream().forEach((entry) -> {
+            entry.getValue().entrySet().stream().forEach((option) -> {
                 to.setOption(option.getKey(), option.getValue(), entry.getKey());
-            }
-        }
+            });
+        });
 
         to.setParents(from.getParents(null), null);
-        for (String world : from.getWorlds()) {
+        from.getWorlds().stream().forEach((world) -> {
             List<String> groups = from.getParents(world);
-            if (groups == null || groups.isEmpty()) {
-                continue;
+            if (!(groups == null || groups.isEmpty())) {
+                to.setParents(groups, world);
             }
-            to.setParents(groups, world);
-        }
+        });
     }
 
     public static void transferGroup(PermissionsGroupData from, PermissionsGroupData to) {

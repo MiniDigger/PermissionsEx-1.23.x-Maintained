@@ -50,9 +50,9 @@ public abstract class PermissionsCommand implements CommandListener {
     }
 
     protected void informGroup(PermissionsEx plugin, PermissionGroup group, String message) {
-        for (PermissionUser user : group.getActiveUsers()) {
+        group.getActiveUsers().stream().forEach((user) -> {
             this.informPlayer(plugin, user, message);
-        }
+        });
     }
 
     protected void informPlayer(PermissionsEx plugin, PermissionUser user, String message) {
@@ -73,14 +73,14 @@ public abstract class PermissionsCommand implements CommandListener {
     }
 
     protected void printEntityInheritance(CommandSender sender, List<PermissionGroup> groups) {
-        for (PermissionGroup group : groups) {
+        groups.stream().forEach((group) -> {
             String rank = "not ranked";
             if (group.isRanked()) {
                 rank = "rank " + group.getRank() + " @ " + group.getRankLadder();
             }
 
             sender.sendMessage("   " + group.getIdentifier() + " (" + rank + ")");
-        }
+        });
     }
 
     private String nameToUUID(String name) {
@@ -131,7 +131,7 @@ public abstract class PermissionsCommand implements CommandListener {
         }
 
         if (players.size() > 1) {
-            throw new AutoCompleteChoicesException(players.toArray(new String[0]), argName);
+            throw new AutoCompleteChoicesException(players.toArray(new String[players.size()]), argName);
         } else if (players.size() == 1) {
             return players.get(0);
         }
@@ -167,7 +167,7 @@ public abstract class PermissionsCommand implements CommandListener {
         }
 
         if (groups.size() > 1) { // Found several choices
-            throw new AutoCompleteChoicesException(groups.toArray(new String[0]), argName);
+            throw new AutoCompleteChoicesException(groups.toArray(new String[groups.size()]), argName);
         } else if (groups.size() == 1) { // Found one name
             return groups.get(0);
         }
@@ -198,7 +198,7 @@ public abstract class PermissionsCommand implements CommandListener {
         }
 
         if (worlds.size() > 1) { // Found several choices
-            throw new AutoCompleteChoicesException(worlds.toArray(new String[0]), argName);
+            throw new AutoCompleteChoicesException(worlds.toArray(new String[worlds.size()]), argName);
         } else if (worlds.size() == 1) { // Found one name
             return worlds.get(0);
         }
@@ -241,7 +241,7 @@ public abstract class PermissionsCommand implements CommandListener {
         }
 
         if (permissions.size() > 0) {
-            String[] permissionArray = permissions.toArray(new String[0]);
+            String[] permissionArray = permissions.toArray(new String[permissions.size()]);
 
             if (permissionArray.length == 1) {
                 return permissionArray[0];
@@ -285,20 +285,18 @@ public abstract class PermissionsCommand implements CommandListener {
             groups = parent.getChildGroups(worldName);
         }
 
-        for (PermissionGroup group : groups) {
-            if (parent == null && !group.getParents(worldName).isEmpty()) {
-                continue;
-            }
-
+        groups.stream().filter((group) -> !(parent == null && !group.getParents(worldName).isEmpty())).map((group) -> {
             buffer.append(StringUtils.repeat("  ", level)).append(" - ").append(group.getIdentifier()).append("\n");
-
+            return group;
+        }).map((group) -> {
             // Groups
             buffer.append(printHierarchy(group, worldName, level + 1));
-
-            for (PermissionUser user : group.getUsers(worldName)) {
+            return group;
+        }).forEach((group) -> {
+            group.getUsers(worldName).stream().forEach((user) -> {
                 buffer.append(StringUtils.repeat("  ", level + 1)).append(" + ").append(describeUser(user)).append("\n");
-            }
-        }
+            });
+        });
 
         return buffer.toString();
     }
@@ -337,11 +335,9 @@ public abstract class PermissionsCommand implements CommandListener {
             permissions.addAll(sprintPermissions(world, worldsPermissions));
         }
 
-        for (String parentWorld : PermissionsEx.getPermissionManager().getWorldInheritance(world)) {
-            if (parentWorld != null && !parentWorld.isEmpty()) {
-                permissions.addAll(getPermissionsTree(entity, parentWorld, level + 1));
-            }
-        }
+        PermissionsEx.getPermissionManager().getWorldInheritance(world).stream().filter((parentWorld) -> (parentWorld != null && !parentWorld.isEmpty())).forEach((parentWorld) -> {
+            permissions.addAll(getPermissionsTree(entity, parentWorld, level + 1));
+        });
 
         if (level == 0 && world != null && allPermissions.get(null) != null) { // default world permissions
             permissions.addAll(sprintPermissions("common", allPermissions.get(null)));
@@ -357,9 +353,9 @@ public abstract class PermissionsCommand implements CommandListener {
             return permissionList;
         }
 
-        for (String permission : permissions) {
+        permissions.stream().forEach((permission) -> {
             permissionList.add(permission + (world != null ? " @" + world : ""));
-        }
+        });
 
         return permissionList;
     }

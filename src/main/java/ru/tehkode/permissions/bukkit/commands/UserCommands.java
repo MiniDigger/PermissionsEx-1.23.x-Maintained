@@ -48,9 +48,9 @@ public class UserCommands extends PermissionsCommand {
         Set<PermissionUser> users = plugin.getPermissionsManager().getUsers();
 
         sender.sendMessage(ChatColor.WHITE + "Currently registered users: ");
-        for (PermissionUser user : users) {
+        users.stream().forEach((user) -> {
             sender.sendMessage(user.getIdentifier() + ChatColor.GRAY + " (Last known username: " + user.getName() + ") " + ChatColor.DARK_GREEN + "[" + StringUtils.implode(user.getParentIdentifiers(), ", ") + "]");
-        }
+        });
     }
 
     @Command(name = "pex",
@@ -96,23 +96,21 @@ public class UserCommands extends PermissionsCommand {
         printEntityInheritance(sender, user.getParents());
 
         Map<String, List<PermissionGroup>> allParents = user.getAllParents();
-        for (String world : allParents.keySet()) {
-            if (world == null) {
-                continue;
-            }
-
+        allParents.keySet().stream().filter((world) -> !(world == null)).map((world) -> {
             sender.sendMessage("  @" + world + ":");
+            return world;
+        }).forEach((world) -> {
             printEntityInheritance(sender, allParents.get(world));
-        }
+        });
 
         sender.sendMessage(userName + "'s permissions:");
 
         this.sendMessage(sender, this.mapPermissions(worldName, user, 0));
 
         sender.sendMessage(userName + "'s options:");
-        for (Map.Entry<String, String> option : user.getOptions(worldName).entrySet()) {
+        user.getOptions(worldName).entrySet().stream().forEach((option) -> {
             sender.sendMessage("  " + option.getKey() + " = \"" + option.getValue() + "\"");
-        }
+        });
     }
 
     @Command(name = "pex",
@@ -132,9 +130,9 @@ public class UserCommands extends PermissionsCommand {
 
         sender.sendMessage(user.getName() + "'s permissions:");
 
-        for (String permission : user.getPermissions(worldName)) {
+        user.getPermissions(worldName).stream().forEach((permission) -> {
             sender.sendMessage("  " + permission);
-        }
+        });
 
     }
 
@@ -489,9 +487,9 @@ public class UserCommands extends PermissionsCommand {
         }
 
         sender.sendMessage("User \"" + describeUser(user) + "\" @" + worldName + " currently in:");
-        for (PermissionGroup group : user.getParents(worldName)) {
+        user.getParents(worldName).stream().forEach((group) -> {
             sender.sendMessage("  " + group.getIdentifier());
-        }
+        });
     }
 
     @Command(name = "pex",
@@ -632,7 +630,7 @@ public class UserCommands extends PermissionsCommand {
         int removed = 0;
 
         Long deadline = (System.currentTimeMillis() / 1000L) - threshold;
-        for (PermissionUser user : group.getUsers()) {
+        for (PermissionUser user : group.getUsers()) { // TODO: figure out whats wrong here can not convert to Functional Operation
             int lastLogin = user.getOwnOptionInteger("last-login-time", null, 0);
 
             if (lastLogin > 0 && lastLogin < deadline) {

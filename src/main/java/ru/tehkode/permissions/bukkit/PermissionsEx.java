@@ -246,13 +246,10 @@ public class PermissionsEx extends JavaPlugin implements NativeInterface {
 
                     }
                 };
-                getServer().getScheduler().runTaskAsynchronously(this, new Runnable() {
-                    @Override
-                    public void run() {
-                        switch (updater.getResult()) {
-                            case SUCCESS:
-                                getLogger().log(Level.INFO, "An update to {0} was downloaded and will be applied on next server launch.", updater.getLatestName());
-                        }
+                getServer().getScheduler().runTaskAsynchronously(this, () -> {
+                    switch (updater.getResult()) {
+                        case SUCCESS:
+                            getLogger().log(Level.INFO, "An update to {0} was downloaded and will be applied on next server launch.", updater.getLatestName());
                     }
                 });
             }

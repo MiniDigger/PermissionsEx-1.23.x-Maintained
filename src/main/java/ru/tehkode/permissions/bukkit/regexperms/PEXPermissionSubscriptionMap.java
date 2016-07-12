@@ -66,11 +66,9 @@ public class PEXPermissionSubscriptionMap extends HashMap<String, Map<Permissibl
     public void uninject() {
         if (INSTANCE.compareAndSet(this, null)) {
             Map<String, Map<Permissible, Boolean>> unwrappedMap = new HashMap<>(this.size());
-            for (Map.Entry<String, Map<Permissible, Boolean>> entry : this.entrySet()) {
-                if (entry.getValue() instanceof PEXSubscriptionValueMap) {
-                    Map<Permissible, Boolean> put = unwrappedMap.put(entry.getKey(), ((PEXSubscriptionValueMap) entry.getValue()).backing);
-                }
-            }
+            this.entrySet().stream().filter((entry) -> (entry.getValue() instanceof PEXSubscriptionValueMap)).forEach((entry) -> {
+                Map<Permissible, Boolean> put = unwrappedMap.put(entry.getKey(), ((PEXSubscriptionValueMap) entry.getValue()).backing);
+            });
             INJECTOR.set(manager, unwrappedMap);
         }
     }
@@ -83,7 +81,7 @@ public class PEXPermissionSubscriptionMap extends HashMap<String, Map<Permissibl
 
         Map<Permissible, Boolean> result = super.get(key);
         if (result == null) {
-            result = new PEXSubscriptionValueMap((String) key, new WeakHashMap<Permissible, Boolean>(), this);
+            result = new PEXSubscriptionValueMap((String) key, new WeakHashMap<>(), this);
             super.put((String) key, result);
         } else if (!(result instanceof PEXSubscriptionValueMap)) {
             result = new PEXSubscriptionValueMap((String) key, result, this);

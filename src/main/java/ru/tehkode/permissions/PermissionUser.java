@@ -22,7 +22,6 @@ import com.google.common.collect.Maps;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import ru.tehkode.permissions.events.PermissionEntityEvent;
 import ru.tehkode.permissions.exceptions.RankingException;
 
 import java.util.*;
@@ -228,9 +227,9 @@ public class PermissionUser extends PermissionEntity {
     }
 
     public void removeGroup(PermissionGroup group) {
-        for (String worldName : this.getWorlds()) {
+        this.getWorlds().stream().forEach((worldName) -> {
             this.removeGroup(group, worldName);
-        }
+        });
 
         this.removeGroup(group, null);
     }
@@ -260,10 +259,8 @@ public class PermissionUser extends PermissionEntity {
     }
 
     public boolean inGroup(PermissionGroup group, boolean checkInheritance) {
-        for (String worldName : this.getWorlds()) {
-            if (this.inGroup(group, worldName, checkInheritance)) {
-                return true;
-            }
+        if (this.getWorlds().stream().anyMatch((worldName) -> (this.inGroup(group, worldName, checkInheritance)))) {
+            return true;
         }
 
         return this.inGroup(group, null, checkInheritance);
@@ -469,13 +466,9 @@ public class PermissionUser extends PermissionEntity {
     public Map<String, PermissionGroup> getRankLadders() {
         Map<String, PermissionGroup> ladders = new HashMap<>();
 
-        for (PermissionGroup group : this.getParents()) {
-            if (!group.isRanked()) {
-                continue;
-            }
-
+        this.getParents().stream().filter((group) -> !(!group.isRanked())).forEach((group) -> {
             ladders.put(group.getRankLadder(), group);
-        }
+        });
 
         return ladders;
     }
@@ -620,14 +613,16 @@ public class PermissionUser extends PermissionEntity {
             }
         }
 
-        for (Map.Entry<String, String> ent : removeGroups) {
+        removeGroups.stream().map((ent) -> {
             this.setOption("group-" + ent.getKey() + "-until", null, ent.getValue()); // remove option
+            return ent;
+        }).map((ent) -> {
             this.removeGroup(ent.getKey(), ent.getValue()); // remove membership
-            if (isDebug()) {
-                manager.getLogger().log(Level.INFO, ent.getValue() != null ? "Timed group '{0}' in world '{1}' expired from user {2}/{3}"
-                        : "Timed group {0} expired from user {2}/{3}", new Object[]{ent.getKey(), ent.getValue(), getIdentifier(), getName()});
-            }
-        }
+            return ent;
+        }).filter((ent) -> (isDebug())).forEach((ent) -> {
+            manager.getLogger().log(Level.INFO, ent.getValue() != null ? "Timed group '{0}' in world '{1}' expired from user {2}/{3}"
+                    : "Timed group {0} expired from user {2}/{3}", new Object[]{ent.getKey(), ent.getValue(), getIdentifier(), getName()});
+        });
 
         if (nextExpiration < Long.MAX_VALUE) {
             // Schedule the next timed groups check with the permissions manager

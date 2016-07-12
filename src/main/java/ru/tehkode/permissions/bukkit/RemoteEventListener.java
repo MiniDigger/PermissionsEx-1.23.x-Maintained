@@ -6,7 +6,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import ru.tehkode.permissions.PermissionGroup;
 import ru.tehkode.permissions.PermissionManager;
-import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.events.PermissionEntityEvent;
 import ru.tehkode.permissions.events.PermissionEvent;
 import ru.tehkode.permissions.events.PermissionSystemEvent;
@@ -64,9 +63,9 @@ public class RemoteEventListener implements Listener {
                     case GROUP:
                         PermissionGroup group = manager.resetGroup(event.getEntityIdentifier());
                         if (group != null) {
-                            for (PermissionUser user : group.getActiveUsers(true)) {
+                            group.getActiveUsers(true).stream().forEach((user) -> {
                                 manager.resetUser(user.getIdentifier());
-                            }
+                    });
                         }
 
                         break;

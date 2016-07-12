@@ -157,12 +157,12 @@ public class FileData implements PermissionsUserData, PermissionsGroupData {
         //World-specific permissions
         ConfigurationSection worldsSection = this.node.getConfigurationSection("worlds");
         if (worldsSection != null) {
-            for (String world : worldsSection.getKeys(false)) {
+            worldsSection.getKeys(false).stream().forEach((world) -> {
                 List<String> worldPermissions = this.node.getStringList(FileBackend.buildPath("worlds", world, "permissions"));
                 if (commonPermissions != null) {
                     allPermissions.put(world, Collections.unmodifiableList(worldPermissions));
                 }
-            }
+            });
         }
 
         return Collections.unmodifiableMap(allPermissions);
@@ -208,9 +208,9 @@ public class FileData implements PermissionsUserData, PermissionsGroupData {
 
         allOptions.put(null, this.getOptions(null));
 
-        for (String worldName : this.getWorlds()) {
+        this.getWorlds().stream().forEach((worldName) -> {
             allOptions.put(worldName, this.getOptions(worldName));
-        }
+        });
 
         return Collections.unmodifiableMap(allOptions);
     }
@@ -245,9 +245,9 @@ public class FileData implements PermissionsUserData, PermissionsGroupData {
         Map<String, List<String>> ret = new HashMap<>();
         ret.put(null, getParents(null));
 
-        for (String world : getWorlds()) {
+        getWorlds().stream().forEach((world) -> {
             ret.put(world, getParents(world));
-        }
+        });
         return Collections.unmodifiableMap(ret);
     }
 
@@ -281,13 +281,9 @@ public class FileData implements PermissionsUserData, PermissionsGroupData {
 
     private Map<String, String> collectOptions(ConfigurationSection section) {
         Map<String, String> options = new LinkedHashMap<>();
-        for (String key : section.getKeys(true)) {
-            if (section.isConfigurationSection(key)) {
-                continue;
-            }
-
+        section.getKeys(true).stream().filter((key) -> !(section.isConfigurationSection(key))).forEach((key) -> {
             options.put(key.replace(section.getRoot().options().pathSeparator(), '.'), section.getString(key));
-        }
+        });
 
         return options;
     }
